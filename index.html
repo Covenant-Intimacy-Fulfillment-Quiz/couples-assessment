@@ -6,7 +6,25 @@
   <title>Marriage Connection Assessment</title>
 
   <!-- Required libraries (Chart.js kept if you add charts later) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<canvas id="myChart" width="400" height="300"></canvas>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const ctx = document.getElementById('myChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['A', 'B', 'C'],
+      datasets: [{
+        label: 'Example',
+        data: [10, 20, 30],
+        backgroundColor: ['#4D9DE0', '#FF4D4D', '#3A7FBF']
+      }]
+    }
+  });
+});
+</script>
+
 
   <!-- Google Fonts for heading styles -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&family=Open+Sans:wght@600;700&display=swap" rel="stylesheet">
