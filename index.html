@@ -115,6 +115,8 @@
 
   <script>
     /* ========= Palette & Copy ========= */
+    function $(id){ return document.getElementById(id); }
+
     var typeColors = {
       Spiritual:"#6A4C93", Emotional:"#FF7A70", Commitment:"#FFB347", Intellectual:"#4C6B9B",
       Affable:"#FFB6C1", Recreational:"#4DD2FF", Partnership:"#3CB371", Stability:"#FFD700",
@@ -266,7 +268,6 @@
     ];
 
     /* ========= State ========= */
-    function $(id){ return document.getElementById(id); }
     var mode = "individual";
     var currentPartnerIndex = 0; // 0 = P1, 1 = P2
     var partnerNames = ["Partner 1", "Partner 2"];
@@ -371,7 +372,8 @@
       else { $('coupleFields').classList.remove('hidden'); }
     });
 
-    $('startQuizBtn').addEventListener('click', function(){
+    // One named Start handler; we will swap it for Partner 2 and restore afterward.
+    function handleStartP1Click(){
       mode = $('mode').value;
       if (mode === 'couple') {
         var p1 = $('p1Name').value.trim();
@@ -383,7 +385,21 @@
       }
       currentPartnerIndex = 0;
       startPartnerRun();
-    });
+    }
+
+    function handleStartP2Click(){
+      // Force couple mode and keep existing names
+      mode = 'couple';
+      currentPartnerIndex = 1;
+      startPartnerRun();
+      // After launching P2, restore P1 handler for any future runs
+      $('startQuizBtn').removeEventListener('click', handleStartP2Click);
+      $('startQuizBtn').addEventListener('click', handleStartP1Click);
+      $('startQuizBtn').textContent = 'Start Assessment';
+    }
+
+    // Attach initial handler for P1
+    $('startQuizBtn').addEventListener('click', handleStartP1Click);
 
     $('backBtn').addEventListener('click', function(){ goBack(); });
 
@@ -658,31 +674,28 @@
           '<li>When will we check in to review progress?</li>'+
           '</ul></div>';
 
-        // Show “Add Partner 2” banner if in couple mode and only P1 exists
+        // Show “Add Partner 2” banner if couple mode and only P1 exists
         if (mode === 'couple' && haveP1 && !haveP2) {
           $('afterP1Banner').classList.remove('hidden');
+
           $('startP2Btn').onclick = function(){
             $('afterP1Banner').classList.add('hidden');
-            currentPartnerIndex = 1;
-            // Pre-fill names and lock fields
+
+            // Return to intro but keep names; lock fields; swap start handler
             $('introPage').classList.remove('hidden');
+            $('resultPage').classList.add('hidden');
             $('mode').value = 'couple';
             $('coupleFields').classList.remove('hidden');
             $('p1Name').value = partnerNames[0];
             $('p2Name').value = partnerNames[1];
             $('p1Name').setAttribute('disabled','true');
             $('p2Name').setAttribute('disabled','true');
+
             $('startQuizBtn').textContent = "Start " + partnerNames[1] + "'s Assessment";
-            $('resultPage').classList.add('hidden');
-            // Start Partner 2 on click
-            $('startQuizBtn').onclick = function(){
-              startPartnerRun();
-              // restore default handler after starting partner 2
-              setTimeout(function(){
-                $('startQuizBtn').onclick = null;
-              }, 0);
-            };
+            $('startQuizBtn').removeEventListener('click', handleStartP1Click);
+            $('startQuizBtn').addEventListener('click', handleStartP2Click);
           };
+
           $('keepSoloBtn').onclick = function(){
             $('afterP1Banner').classList.add('hidden');
           };
@@ -725,12 +738,7 @@
     function finishPartnerRun() {
       var profile = computeProfile();
       partnerProfiles[currentPartnerIndex] = profile;
-
-      // ALWAYS show results after a run
-      renderResults();
-
-      // If we’re in true couple flow and just finished P1, the banner lets them start P2.
-      // If they proceed to P2 via banner, startPartnerRun() will run.
+      renderResults(); // always show results after each partner
     }
   </script>
 </body>
