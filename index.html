@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Marriage Connection Assessment</title>
 
-  <!-- Minimal debug: shows first error so we don't silently loop -->
+  <!-- Minimal debug: surface first JS error -->
   <script>
-    window.addEventListener('error', e => {
+    window.addEventListener('error', function(e){
       alert('JS error: ' + (e && e.message ? e.message : e));
     });
   </script>
@@ -46,7 +46,7 @@
     @keyframes fadeIn{ to{ opacity:1; transform:translateY(0) } }
     .results-list{ list-style-position:outside; margin-left:20px; text-align:left; line-height:1.3; }
     .results-list li{ margin-bottom:8px; }
-    .discussion-prompts{ margin:12pt 0; text-align:left; } /* 12pt before & after */
+    .discussion-prompts{ margin:12pt 0; text-align:left; }
     .discussion-prompts h5{ margin:0 0 6px; font-size:1rem; }
     .discussion-prompts ul{ margin:0; padding-left:18px; }
     .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
@@ -58,6 +58,7 @@
     th{ background:var(--brand); color:#fff; }
     .name-inputs{ display:grid; gap:10px; justify-items:center; margin-top:10px; }
     .name-inputs input,.name-inputs select{ padding:10px; border:1px solid var(--brand); border-radius:8px; width:100%; max-width:320px; }
+    .banner{ background:#eaf4ff; border-left:6px solid var(--brand); padding:12px; border-radius:8px; margin:10px 0 0; text-align:left;}
     @media (max-width:700px){ .two-col{ grid-template-columns:1fr } .btn,.answer-btn{ max-width:100% } }
   </style>
 </head>
@@ -102,12 +103,19 @@
     <h2>Your Personalized Connection Profile</h2>
     <div id="results" class="stack"></div>
     <div id="coupleResults" class="stack"></div>
+    <div id="afterP1Banner" class="banner hidden">
+      <strong>Want the couple comparison?</strong>
+      <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+        <button id="startP2Btn" class="btn" style="max-width:260px;">Add Partner 2 Now</button>
+        <button id="keepSoloBtn" class="btn btn-secondary" style="max-width:260px; background:#e7f1fb; color:var(--ink); border:1px solid #cfe3f8;">Keep Solo Results</button>
+      </div>
+    </div>
     <p style="color:var(--muted); font-size:0.9rem; margin-top:10px;">HappyMarriageHappyLife.com</p>
   </div>
 
   <script>
     /* ========= Palette & Copy ========= */
-    const typeColors = {
+    var typeColors = {
       Spiritual:"#6A4C93", Emotional:"#FF7A70", Commitment:"#FFB347", Intellectual:"#4C6B9B",
       Affable:"#FFB6C1", Recreational:"#4DD2FF", Partnership:"#3CB371", Stability:"#FFD700",
       Creative:"#FF66CC", Conflict:"#FFA552", Physical:"#FF8C69", Sexual:"#E63946",
@@ -117,7 +125,7 @@
       StrongWilledReceive:"#FF7A70", SteadyConnector:"#4CAF50", ReassuranceSeeker:"#FFADAD",
       IndependentConnector:"#88C0D0", GuardedConnector:"#A5A5A5"
     };
-    const typeColorsWithOpacity = {
+    var typeColorsWithOpacity = {
       Spiritual:"rgba(106,76,147,0.08)", Emotional:"rgba(255,122,112,0.08)", Commitment:"rgba(255,179,71,0.08)",
       Intellectual:"rgba(76,107,155,0.08)", Affable:"rgba(255,182,193,0.08)", Recreational:"rgba(77,210,255,0.08)",
       Partnership:"rgba(60,179,113,0.08)", Stability:"rgba(255,215,0,0.08)", Creative:"rgba(255,102,204,0.08)",
@@ -131,7 +139,7 @@
       IndependentConnector:"rgba(136,192,208,0.08)", GuardedConnector:"rgba(165,165,165,0.08)"
     };
 
-    const intimacyDescriptions = {
+    var intimacyDescriptions = {
       Spiritual:{desc:"You value a shared faith or sense of purpose, connecting through beliefs and values that guide your life together.",tip:"Engage in a weekly spiritual practice to deepen your bond."},
       Emotional:{desc:"You seek emotional safety and vulnerability, thriving when you feel deeply known and understood.",tip:"Schedule uninterrupted time for heartfelt conversation."},
       Commitment:{desc:"You prioritize trust and loyalty, finding security in a steadfast partnership.",tip:"Review shared goals and keep small promises."},
@@ -146,7 +154,7 @@
       Sexual:{desc:"You express intimacy through sexual connection.",tip:"Discuss desires and schedule protected time."}
     };
 
-    const scriptures = {
+    var scriptures = {
       "Compassion and Care": "“Be completely humble and gentle; be patient, bearing with one another in love.” — Ephesians 4:2",
       "Social Engagement": "“Live in harmony with one another.” — Romans 12:16",
       "Decision-Making and Leadership": "“Plans fail for lack of counsel, but with many advisers they succeed.” — Proverbs 15:22",
@@ -155,14 +163,14 @@
       "Partner Alignment Discussion": "“Two are better than one… If either falls, one can help the other up.” — Ecclesiastes 4:9–10"
     };
 
-    const bondingInsights = {
+    var bondingInsights = {
       SteadyConnector:{desc:"You create a safe space for open communication, fostering resilience and mutual understanding.",challenges:"You may assume quick communication resolves all issues.",conflictStyle:"Seeks harmony; may avoid deeper issues.",tip:"Weekly check-ins where both share feelings."},
       ReassuranceSeeker:{desc:"You thrive on frequent affirmations and emotional vibrancy.",challenges:"Desire for validation may overwhelm your spouse.",conflictStyle:"May over-pursue reassurance, escalating tension.",tip:"Ask for a simple daily affirmation."},
       IndependentConnector:{desc:"Your steady presence brings calm and stability.",challenges:"Space can be perceived as distance.",conflictStyle:"May withdraw to avoid conflict.",tip:"Plan a quiet, no-pressure evening weekly."},
       GuardedConnector:{desc:"You build trust gradually, creating dependable bonds.",challenges:"Guardedness can slow emotional openness.",conflictStyle:"May assume negative intent and get defensive.",tip:"Adopt a small, daily trust-building ritual."}
     };
 
-    const actionPlans = {
+    var actionPlans = {
       Spiritual:{SteadyConnector:"Join a faith-based group and reflect weekly.",ReassuranceSeeker:"Daily shared prayer/affirmation.",IndependentConnector:"Quiet individual reflection, then share.",GuardedConnector:"Weekly short ritual to build trust."},
       Emotional:{SteadyConnector:"20-minute weekly heart-talk.",ReassuranceSeeker:"Ask for daily words of reassurance.",IndependentConnector:"Monthly deep talk to balance space.",GuardedConnector:"One vulnerable share daily."},
       Commitment:{SteadyConnector:"Monthly review of shared goals.",ReassuranceSeeker:"Weekly tangible commitment gesture.",IndependentConnector:"Quarterly goal-setting session.",GuardedConnector:"Daily mini-ritual of commitment."},
@@ -177,7 +185,7 @@
       Sexual:{SteadyConnector:"Weekly intimacy + dialogue.",ReassuranceSeeker:"Regular affirmation of passion.",IndependentConnector:"Monthly intimacy plan.",GuardedConnector:"Weekly desire conversation."}
     };
 
-    const conflictStrategies = {
+    var conflictStrategies = {
       SteadyConnector:{SteadyConnector:"Both value harmony; use weekly check-ins to address issues early.",ReassuranceSeeker:"Offer affirmations during conflict; don’t rush.",IndependentConnector:"Allow space, then discuss with a time box.",GuardedConnector:"Patient, empathetic listening; avoid pressuring openness."},
       ReassuranceSeeker:{SteadyConnector:"Ask for a specific affirmation calmly.",ReassuranceSeeker:"Schedule mutual-validation check-ins.",IndependentConnector:"Offer reassurance, then allow space.",GuardedConnector:"Gentle, clear requests to reduce defensiveness."},
       IndependentConnector:{SteadyConnector:"Explain need for reflection to keep harmony.",ReassuranceSeeker:"Offer reassurance before taking space.",IndependentConnector:"Agree on a resolution timeline.",GuardedConnector:"Initiate gentle check-ins to build trust."},
@@ -185,7 +193,7 @@
     };
 
     /* ========= Questions ========= */
-    const questions = [
+    var questions = [
       { q:"When your spouse is stressed, what's your first instinct?", opts:[
         { text:"Lighten the mood with fun or a distraction.", t:"Extroverted", i:"Recreational", style:"Recreational" },
         { text:"Take charge and solve the problem.", t:"StrongWilled", i:"Conflict", style:"Reflective" },
@@ -249,13 +257,6 @@
         { text:"Use flexibly to keep peace.", t:"Affable", i:"Affable", style:"Emotional" },
         { text:"Share generously with others.", t:"Supportive", i:"Partnership", style:"Partnership" }
       ]},
-      { q:"How do you feel when unappreciated?", opts:[
-        { text:"Laugh it off.", t:"Extroverted", i:"Emotional", style:"Recreational", b:"SteadyConnector" },
-        { text:"Remind them of my effort.", t:"StrongWilled", i:"Commitment", style:"Reflective", b:"ReassuranceSeeker" },
-        { text:"Feel overlooked.", t:"Reflective", i:"Intellectual", style:"Supportive", b:"IndependentConnector" },
-        { text:"Let it go.", t:"Affable", i:"Affable", style:"Emotional", b:"IndependentConnector" },
-        { text:"Feel deeply hurt.", t:"Supportive", i:"Commitment", style:"Partnership", b:"GuardedConnector" }
-      ]},
       { q:"Do you feel your opinions are respected?", opts:[
         { text:"Strongly Agree", rr:3 },{ text:"Agree", rr:2 },{ text:"Somewhat Agree", rr:1 },{ text:"Disagree", rr:0 },{ text:"Strongly Disagree", rr:0 }
       ]},
@@ -265,14 +266,14 @@
     ];
 
     /* ========= State ========= */
-    const $ = id => document.getElementById(id);
-    let mode = "individual";
-    let currentPartnerIndex = 0; // 0 = P1, 1 = P2
-    let partnerNames = ["Partner 1", "Partner 2"];
-    const partnerProfiles = [];
+    function $(id){ return document.getElementById(id); }
+    var mode = "individual";
+    var currentPartnerIndex = 0; // 0 = P1, 1 = P2
+    var partnerNames = ["Partner 1", "Partner 2"];
+    var partnerProfiles = [];
 
     // Per-run (one partner)
-    let index = 0,
+    var index = 0,
         tempScores = {},
         wantedTempScores = {},
         socialTempScores = {},
@@ -284,7 +285,7 @@
         answers = [];
 
     // Click lock to prevent double fire / loops
-    let questionLock = false;
+    var questionLock = false;
 
     function resetScores() {
       tempScores = { Extroverted:0, StrongWilled:0, Reflective:0, Affable:0, Supportive:0 };
@@ -292,7 +293,7 @@
       socialTempScores = { Extroverted:0, StrongWilled:0, Reflective:0, Affable:0, Supportive:0 };
       decisionTempScores = { Extroverted:0, StrongWilled:0, Reflective:0, Affable:0, Supportive:0 };
       styleScores = { Extroverted:0, StrongWilled:0, Reflective:0, Affable:0, Supportive:0 };
-      intimacyScores = {}; Object.keys(intimacyDescriptions).forEach(k => intimacyScores[k] = 0);
+      intimacyScores = {}; Object.keys(intimacyDescriptions).forEach(function(k){ intimacyScores[k] = 0; });
       bondingScores = {};
       respectRecognitionScore = 0;
       answers = [];
@@ -301,22 +302,23 @@
     }
 
     function normalizeIntimacyScores() {
-      const questionCounts = {
+      var questionCounts = {
         Spiritual:0, Emotional:3, Commitment:2, Intellectual:3, Affable:4,
         Recreational:3, Partnership:4, Stability:2, Creative:2, Conflict:2,
         Physical:2, Sexual:0
       };
-      const normalized = {};
-      Object.keys(intimacyScores).forEach(type=>{
+      var normalized = {};
+      Object.keys(intimacyScores).forEach(function(type){
         normalized[type] = questionCounts[type] ? (intimacyScores[type] / questionCounts[type]) * 3 : 0;
       });
       return normalized;
     }
 
     function getAffectionPreferences() {
-      const highestExpressed = Object.entries(tempScores).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'Extroverted';
-      const highestWanted = Object.entries(wantedTempScores).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'Extroverted';
-      const prefs = {
+      function topKey(obj){ return Object.keys(obj).sort(function(a,b){return obj[b]-obj[a];})[0] || 'Extroverted'; }
+      var highestExpressed = topKey(tempScores);
+      var highestWanted = topKey(wantedTempScores);
+      var prefs = {
         Extroverted:{expressed:"You express love in a recreational style, using fun, lighthearted interactions to create joy.", desired:"You feel loved when your spouse connects in a recreational style."},
         StrongWilled:{expressed:"You express love in a reflective style by solving problems/helping.", desired:"You feel loved when supported in a reflective style."},
         Reflective:{expressed:"You express love in a supportive style through deep, meaningful exchanges.", desired:"You feel loved when offered meaningful connection in a supportive style."},
@@ -331,29 +333,30 @@
       };
     }
     function getSocialPreferences() {
-      const highest = Object.entries(socialTempScores).sort((a,b)=>b[1]-a[1])[0]?.[0];
-      const d = {
+      var top = Object.keys(socialTempScores).sort(function(a,b){return socialTempScores[b]-socialTempScores[a];})[0];
+      var d = {
         Extroverted:"You bring energy and enthusiasm to social settings.",
         StrongWilled:"You lead and organize with confidence.",
         Reflective:"You prefer deep, thoughtful conversations.",
         Affable:"You enjoy calm, low-key interactions.",
         Supportive:"You support others quietly, fostering inclusion."
       };
-      return d[highest] || "You flex between engagement and solitude as needed.";
+      return d[top] || "You flex between engagement and solitude as needed.";
     }
     function getDecisionLeadershipStyle() {
-      const highest = Object.entries(decisionTempScores).sort((a,b)=>b[1]-a[1])[0]?.[0];
-      const s = {
+      var top = Object.keys(decisionTempScores).sort(function(a,b){return decisionTempScores[b]-decisionTempScores[a];})[0];
+      var s = {
         Extroverted:"You decide with enthusiasm, prioritizing enjoyment.",
         StrongWilled:"You decide decisively with clear goals.",
         Reflective:"You analyze thoroughly before deciding.",
         Affable:"You choose harmony and peace in decisions.",
         Supportive:"You collaborate and support shared choices."
       };
-      return s[highest] || "You balance leadership and collaboration in decisions.";
+      return s[top] || "You balance leadership and collaboration in decisions.";
     }
     function getBondingStyle() {
-      return Object.entries(bondingScores).sort((a,b)=>b[1]-a[1])[0]?.[0] || "SteadyConnector";
+      var top = Object.keys(bondingScores).sort(function(a,b){return bondingScores[b]-bondingScores[a];})[0];
+      return top || "SteadyConnector";
     }
     function respectSummary(score) {
       return score >= 5 ? "You feel strongly respected and aligned—solid ground for intimacy."
@@ -362,16 +365,17 @@
     }
 
     /* ========= UI wiring ========= */
-    $('mode').addEventListener('change', () => {
+    $('mode').addEventListener('change', function(){
       mode = $('mode').value;
-      $('coupleFields').classList.toggle('hidden', mode !== 'couple');
+      if (mode !== 'couple') { $('coupleFields').classList.add('hidden'); }
+      else { $('coupleFields').classList.remove('hidden'); }
     });
 
-    $('startQuizBtn').addEventListener('click', () => {
+    $('startQuizBtn').addEventListener('click', function(){
       mode = $('mode').value;
       if (mode === 'couple') {
-        const p1 = $('p1Name').value.trim();
-        const p2 = $('p2Name').value.trim();
+        var p1 = $('p1Name').value.trim();
+        var p2 = $('p2Name').value.trim();
         if (!p1 || !p2) { alert('Please enter both partner names.'); return; }
         partnerNames = [p1, p2];
       } else {
@@ -381,63 +385,60 @@
       startPartnerRun();
     });
 
-    $('backBtn').addEventListener('click', () => goBack());
+    $('backBtn').addEventListener('click', function(){ goBack(); });
 
     function startPartnerRun() {
       resetScores();
       $('introPage').classList.add('hidden');
       $('resultPage').classList.add('hidden');
       $('quizPage').classList.remove('hidden');
-      $('quizHeading').textContent = mode === 'couple'
-        ? `Intimacy Profile Assessment — ${partnerNames[currentPartnerIndex]}`
+      $('quizHeading').textContent = (mode === 'couple')
+        ? ('Intimacy Profile Assessment — ' + partnerNames[currentPartnerIndex])
         : 'Intimacy Profile Assessment';
       showQuestion();
     }
 
     function showQuestion() {
-      // Safety: if we somehow reach beyond the last question, finish
-      if (index >= questions.length) {
-        finishPartnerRun();
-        return;
-      }
+      if (index >= questions.length) { finishPartnerRun(); return; }
 
-      const q = questions[index];
-      const progress = $('progress');
-      const progressBar = $('progressBar');
-      const container = $('questionContainer');
+      var q = questions[index];
+      var progress = $('progress');
+      var progressBar = $('progressBar');
+      var container = $('questionContainer');
 
-      progress.textContent = `Question ${index + 1} of ${questions.length}`;
-      progressBar.style.width = `${((index + 1) / questions.length) * 100}%`;
+      progress.textContent = 'Question ' + (index + 1) + ' of ' + questions.length;
+      progressBar.style.width = (((index + 1) / questions.length) * 100) + '%';
 
-      let html = `<h3 id="questionLabel">${q.q}</h3>`;
-      q.opts.forEach((o, i) => {
-        html += `<button class="answer-btn" role="radio" aria-checked="false" aria-labelledby="questionLabel" data-i="${i}">${o.text}</button>`;
+      var html = '<h3 id="questionLabel">' + q.q + '</h3>';
+      q.opts.forEach(function(o, i){
+        html += '<button class="answer-btn" role="radio" aria-checked="false" aria-labelledby="questionLabel" data-i="'+i+'">'+o.text+'</button>';
       });
       container.innerHTML = html;
 
-      // Reset the click lock for this question
       questionLock = false;
 
-      // Robust delegated handler (single listener). Prevent multiple answers.
-      container.onclick = (ev) => {
-        const btn = ev.target && ev.target.closest ? ev.target.closest('.answer-btn') : null;
+      container.onclick = function(ev){
+        var target = ev.target;
+        var btn = null;
+        while (target && target !== container) {
+          if (target.classList && target.classList.contains('answer-btn')) { btn = target; break; }
+          target = target.parentNode;
+        }
         if (!btn || questionLock) return;
-        questionLock = true; // lock immediately to avoid double-fire
-        const i = Number(btn.dataset.i);
-        if (!Number.isFinite(i)) { questionLock = false; return; }
+        questionLock = true;
+        var i = Number(btn.getAttribute('data-i'));
+        if (!isFinite(i)) { questionLock = false; return; }
         btn.classList.add('selected');
-        // small delay to show feedback; then record
-        setTimeout(() => { recordAnswer(i); }, 120);
+        setTimeout(function(){ recordAnswer(i); }, 120);
       };
 
-      $('backBtn').classList.toggle('hidden', index === 0);
+      if (index === 0) $('backBtn').classList.add('hidden'); else $('backBtn').classList.remove('hidden');
     }
 
     function recordAnswer(i) {
-      // Guard against stray calls
       if (index >= questions.length) { finishPartnerRun(); return; }
 
-      const o = questions[index].opts[i];
+      var o = questions[index].opts[i];
       answers[index] = i;
 
       if (o.t) {
@@ -452,19 +453,16 @@
       if (o.rr !== undefined) respectRecognitionScore += o.rr;
 
       index++;
-      if (index < questions.length) {
-        showQuestion();
-      } else {
-        finishPartnerRun();
-      }
+      if (index < questions.length) { showQuestion(); }
+      else { finishPartnerRun(); }
     }
 
     function goBack() {
       if (index === 0) return;
       index--;
-      const prev = answers[index];
+      var prev = answers[index];
       if (prev != null) {
-        const o = questions[index].opts[prev];
+        var o = questions[index].opts[prev];
         if (o.t) {
           if (o.domain === "Affection" && o.wanted) wantedTempScores[o.t]--;
           else if (o.domain === "Social") socialTempScores[o.t]--;
@@ -477,280 +475,262 @@
         if (o.rr !== undefined) respectRecognitionScore -= o.rr;
         answers[index] = undefined;
       }
-      // When going back, unlock and re-render
       questionLock = false;
       showQuestion();
     }
 
     function computeProfile() {
-      const normalized = normalizeIntimacyScores();
-      const sorted = Object.entries(normalized).sort((a,b)=>b[1]-a[1]);
-      const priority = sorted.slice(0,4);
-      const progress = sorted.slice(4,8);
-      const presence = sorted.slice(8,12);
-      const affection = getAffectionPreferences();
-      const social = getSocialPreferences();
-      const decision = getDecisionLeadershipStyle();
-      const bondingKey = getBondingStyle();
-      const bondingLabel = (bondingKey || 'SteadyConnector').replace(/([a-z])([A-Z])/g,'$1 $2');
-      const respectText = respectSummary(respectRecognitionScore);
-      return { normalized, sorted, priority, progress, presence, affection, social, decision, bondingKey, bondingLabel, respectText };
+      var normalized = normalizeIntimacyScores();
+      var sorted = Object.keys(normalized).map(function(k){ return [k, normalized[k]]; }).sort(function(a,b){ return b[1]-a[1]; });
+      var priority = sorted.slice(0,4);
+      var progress = sorted.slice(4,8);
+      var presence = sorted.slice(8,12);
+      var affection = getAffectionPreferences();
+      var social = getSocialPreferences();
+      var decision = getDecisionLeadershipStyle();
+      var bondingKey = getBondingStyle();
+      var bondingLabel = (bondingKey || 'SteadyConnector').replace(/([a-z])([A-Z])/g,'$1 $2');
+      var respectText = respectSummary(respectRecognitionScore);
+      return { normalized:normalized, sorted:sorted, priority:priority, progress:progress, presence:presence, affection:affection, social:social, decision:decision, bondingKey:bondingKey, bondingLabel:bondingLabel, respectText:respectText };
     }
 
-    function block(type, extraHtml = '') {
-      const border = typeColors?.[type] || '#4D9DE0';
-      const bg = typeColorsWithOpacity?.[type] || 'rgba(77,157,224,0.08)';
-      return `<div class="result-block" style="border-left-color:${border}; background:${bg};">${extraHtml}</div>`;
+    function block(type, extraHtml) {
+      var border = (typeColors && typeColors[type]) ? typeColors[type] : '#4D9DE0';
+      var bg = (typeColorsWithOpacity && typeColorsWithOpacity[type]) ? typeColorsWithOpacity[type] : 'rgba(77,157,224,0.08)';
+      return '<div class="result-block" style="border-left-color:'+border+'; background:'+bg+';">'+(extraHtml || '')+'</div>';
     }
     function scriptureLine(title) {
-      const verse = (scriptures && scriptures[title]) || "";
-      return verse ? `<div class="scripture-line">${verse}</div>` : "";
+      var verse = (scriptures && scriptures[title]) || "";
+      return verse ? '<div class="scripture-line">'+verse+'</div>' : "";
     }
-    function sectionHTML(title, text, items, prompts = []) {
-      const cards = (items || []).map(pair => {
-        const type = Array.isArray(pair) ? pair[0] : pair;
-        const desc = (intimacyDescriptions?.[type]?.desc) || "(description unavailable)";
-        const color = typeColors?.[type] || '#4D9DE0';
-        const bg = typeColorsWithOpacity?.[type] || 'rgba(77,157,224,0.08)';
-        return `<div class="result-block" style="border-left:8px solid ${color}; background-color:${bg};">
-          <strong>${type || 'Unknown'}</strong> – ${desc}
-        </div>`;
+    function sectionHTML(title, text, items, prompts) {
+      prompts = prompts || [];
+      var cards = (items || []).map(function(pair){
+        var type = Array.isArray(pair) ? pair[0] : pair;
+        var desc = (intimacyDescriptions && intimacyDescriptions[type] && intimacyDescriptions[type].desc) ? intimacyDescriptions[type].desc : "(description unavailable)";
+        var color = (typeColors && typeColors[type]) ? typeColors[type] : '#4D9DE0';
+        var bg = (typeColorsWithOpacity && typeColorsWithOpacity[type]) ? typeColorsWithOpacity[type] : 'rgba(77,157,224,0.08)';
+        return '<div class="result-block" style="border-left:8px solid '+color+'; background-color:'+bg+';"><strong>'+ (type || 'Unknown') +'</strong> – '+ desc +'</div>';
       }).join('');
-      const promptsHtml = (prompts && prompts.length)
-        ? `<div class="discussion-prompts"><h5>Discussion Prompts</h5><ul>${prompts.map(p=>`<li>${p}</li>`).join('')}</ul></div>`
-        : '';
-      return `
-        <div>
-          <div class="subsection-divider"></div>
-          <h4 class="subsection-title">${title}</h4>
-          ${scriptureLine(title)}
-          <p class="intro-text">${text}</p>
-          ${cards}
-          ${promptsHtml}
-        </div>
-      `;
+      var promptsHtml = prompts.length ? '<div class="discussion-prompts"><h5>Discussion Prompts</h5><ul>'+prompts.map(function(p){return '<li>'+p+'</li>';}).join('')+'</ul></div>' : '';
+      return '<div><div class="subsection-divider"></div><h4 class="subsection-title">'+title+'</h4>'+scriptureLine(title)+'<p class="intro-text">'+text+'</p>'+cards+promptsHtml+'</div>';
     }
 
     function renderSingleProfile(p, nameLabel) {
-      const { priority=[], progress=[], presence=[], affection={}, social='', decision='', bondingKey='SteadyConnector', bondingLabel='Steady Connector', respectText='' } = p || {};
-      const expressedType = affection?.expressedType || 'ExtrovertedExpress';
-      const desiredType = affection?.desiredType || 'ExtrovertedReceive';
-      const sec2Prompts = [
+      var priority = p.priority || [];
+      var progress = p.progress || [];
+      var presence = p.presence || [];
+      var affection = p.affection || {};
+      var social = p.social || '';
+      var decision = p.decision || '';
+      var bondingKey = p.bondingKey || 'SteadyConnector';
+      var bondingLabel = p.bondingLabel || 'Steady Connector';
+      var respectText = p.respectText || '';
+      var expressedType = affection.expressedType || 'ExtrovertedExpress';
+      var desiredType = affection.desiredType || 'ExtrovertedReceive';
+      var sec2Prompts = [
         "Steward your strengths—use them intentionally twice this week.",
         "Choose one growth area to practice once this week.",
         "Pick one untapped opportunity to experiment with together."
       ];
-      return `
-        <div class="section-divider"></div>
-        <div class="partner-name">${nameLabel || 'Partner'}</div>
+      return ''+
+        '<div class="section-divider"></div>'+
+        '<div class="partner-name">'+(nameLabel || 'Partner')+'</div>'+
 
-        ${sectionHTML("Your Intimacy Type Preferences","Your results highlight how you naturally connect, where growth is possible, and new ways to bond.",[],[])}
-        ${sectionHTML("Core Connection Strengths","These top four intimacy types are where you naturally excel.",priority,sec2Prompts)}
-        ${sectionHTML("Areas for Growth","These middle four types will improve with a little intentional focus.",progress)}
-        ${sectionHTML("Untapped Opportunities","These lower four types may be overlooked—trying one can open a new door.",presence)}
+        sectionHTML("Your Intimacy Type Preferences","Your results highlight how you naturally connect, where growth is possible, and new ways to bond.",[],[]) +
+        sectionHTML("Core Connection Strengths","These top four intimacy types are where you naturally excel.",priority,sec2Prompts) +
+        sectionHTML("Areas for Growth","These middle four types will improve with a little intentional focus.",progress) +
+        sectionHTML("Untapped Opportunities","These lower four types may be overlooked—trying one can open a new door.",presence) +
 
-        <div class="subsection-divider"></div>
-        <h4 class="subsection-title">Compassion and Care</h4>
-        ${scriptureLine("Compassion and Care")}
-        ${block(expressedType, `<strong>How You Express Love:</strong> ${affection?.expressed || ''}<p class="action-tip">Tip: Share how these expressions feel natural to you.</p>`)}
-        ${block(desiredType, `<strong>How You Feel Loved:</strong> ${affection?.desired || ''}<p class="action-tip">Tip: Tell your spouse what helps you feel valued.</p>`)}
-        <div class="discussion-prompts">
-          <h5>Discussion Prompts</h5>
-          <ul>
-            <li>Which expression feels most natural to you? Which request helps you feel most loved?</li>
-            <li>What small practice could your spouse try this week to speak your “love language” better?</li>
-          </ul>
-        </div>
+        '<div class="subsection-divider"></div>'+
+        '<h4 class="subsection-title">Compassion and Care</h4>'+
+        scriptureLine("Compassion and Care")+
+        block(expressedType, '<strong>How You Express Love:</strong> '+(affection.expressed || '')+'<p class="action-tip">Tip: Share how these expressions feel natural to you.</p>')+
+        block(desiredType, '<strong>How You Feel Loved:</strong> '+(affection.desired || '')+'<p class="action-tip">Tip: Tell your spouse what helps you feel valued.</p>')+
+        '<div class="discussion-prompts"><h5>Discussion Prompts</h5><ul><li>Which expression feels most natural to you? Which request helps you feel most loved?</li><li>What small practice could your spouse try this week to speak your “love language” better?</li></ul></div>'+
 
-        <h4 class="subsection-title">Social Engagement</h4>
-        ${scriptureLine("Social Engagement")}
-        ${block('ExtrovertedExpress', `<strong>Your Social Style:</strong> ${social}`)}
-        <div class="discussion-prompts"><h5>Discussion Prompts</h5><ul><li>Where do your social needs align or differ? Plan one event that fits both.</li></ul></div>
+        '<h4 class="subsection-title">Social Engagement</h4>'+
+        scriptureLine("Social Engagement")+
+        block('ExtrovertedExpress', '<strong>Your Social Style:</strong> '+social)+
+        '<div class="discussion-prompts"><h5>Discussion Prompts</h5><ul><li>Where do your social needs align or differ? Plan one event that fits both.</li></ul></div>'+
 
-        <h4 class="subsection-title">Decision-Making and Leadership</h4>
-        ${scriptureLine("Decision-Making and Leadership")}
-        ${block('ReflectiveExpress', `<strong>Your Decision Style:</strong> ${decision}`)}
-        <div class="discussion-prompts"><h5>Discussion Prompts</h5><ul><li>How can your decision styles complement each other this month?</li></ul></div>
+        '<h4 class="subsection-title">Decision-Making and Leadership</h4>'+
+        scriptureLine("Decision-Making and Leadership")+
+        block('ReflectiveExpress', '<strong>Your Decision Style:</strong> '+decision)+
+        '<div class="discussion-prompts"><h5>Discussion Prompts</h5><ul><li>How can your decision styles complement each other this month?</li></ul></div>'+
 
-        <h4 class="subsection-title">Respect and Recognition</h4>
-        ${scriptureLine("Respect and Recognition")}
-        ${block('Spiritual', `<strong>Your Alignment:</strong> ${respectText}`)}
-        <div class="discussion-prompts"><h5>Discussion Prompts</h5><ul><li>What specific actions help you feel honored and recognized?</li></ul></div>
+        '<h4 class="subsection-title">Respect and Recognition</h4>'+
+        scriptureLine("Respect and Recognition")+
+        block('Spiritual', '<strong>Your Alignment:</strong> '+respectText)+
+        '<div class="discussion-prompts"><h5>Discussion Prompts</h5><ul><li>What specific actions help you feel honored and recognized?</li></ul></div>'+
 
-        ${block(bondingKey, `
-          <strong>Connection Pattern:</strong> ${bondingLabel}<br/>
-          <strong>Strengths:</strong> ${bondingInsights?.[bondingKey]?.desc || ''}<br/>
-          <strong>Challenges:</strong> ${bondingInsights?.[bondingKey]?.challenges || ''}<br/>
-          <strong>Conflict Style:</strong> ${bondingInsights?.[bondingKey]?.conflictStyle || ''}
-        `)}
-      `;
+        block(bondingKey, '<strong>Connection Pattern:</strong> '+bondingLabel+'<br/><strong>Strengths:</strong> '+(bondingInsights[bondingKey] ? bondingInsights[bondingKey].desc : '')+'<br/><strong>Challenges:</strong> '+(bondingInsights[bondingKey] ? bondingInsights[bondingKey].challenges : '')+'<br/><strong>Conflict Style:</strong> '+(bondingInsights[bondingKey] ? bondingInsights[bondingKey].conflictStyle : ''))
+      ;
     }
 
     function renderCoupleComparison(p1, p2) {
-      const top1 = (p1?.priority || []).map(x=>x[0]);
-      const top2 = (p2?.priority || []).map(x=>x[0]);
-      const overlap = top1.filter(t => top2.includes(t));
-      const only1 = top1.filter(t => !overlap.includes(t));
-      const only2 = top2.filter(t => !overlap.includes(t));
+      var top1 = (p1.priority || []).map(function(x){return x[0];});
+      var top2 = (p2.priority || []).map(function(x){return x[0];});
+      var overlap = top1.filter(function(t){return top2.indexOf(t) >= 0;});
+      var only1 = top1.filter(function(t){return overlap.indexOf(t) < 0;});
+      var only2 = top2.filter(function(t){return overlap.indexOf(t) < 0;});
 
-      const want1 = (p1?.affection?.desiredType || '').replace(/(Express|Receive)$/,'');
-      const want2 = (p2?.affection?.desiredType || '').replace(/(Express|Receive)$/,'');
-      const express1 = (p1?.affection?.expressedType || '').replace(/(Express|Receive)$/,'');
-      const express2 = (p2?.affection?.expressedType || '').replace(/(Express|Receive)$/,'');
+      var want1 = (p1.affection && p1.affection.desiredType ? p1.affection.desiredType : '').replace(/(Express|Receive)$/,'');
+      var want2 = (p2.affection && p2.affection.desiredType ? p2.affection.desiredType : '').replace(/(Express|Receive)$/,'');
+      var express1 = (p1.affection && p1.affection.expressedType ? p1.affection.expressedType : '').replace(/(Express|Receive)$/,'');
+      var express2 = (p2.affection && p2.affection.expressedType ? p2.affection.expressedType : '').replace(/(Express|Receive)$/,'');
 
-      const youFillThem = express1 && want2 && (express1 === want2) ? `Great fit!` : `Add a simple weekly practice in ${want2 || 'their preferred style'}.`;
-      const theyFillYou = express2 && want1 && (express2 === want1) ? `Great fit!` : `Add a weekly practice in ${want1 || 'their preferred style'}.`;
+      var youFillThem = (express1 && want2 && (express1 === want2)) ? 'Great fit!' : 'Add a simple weekly practice in ' + (want2 || 'their preferred style') + '.';
+      var theyFillYou = (express2 && want1 && (express2 === want1)) ? 'Great fit!' : 'Add a weekly practice in ' + (want1 || 'their preferred style') + '.';
 
-      const strat12 = (conflictStrategies?.[p1?.bondingKey]||{})[p2?.bondingKey] || "Use weekly check-ins and reflective listening.";
-      const strat21 = (conflictStrategies?.[p2?.bondingKey]||{})[p1?.bondingKey] || "Use weekly check-ins and reflective listening.";
+      var strat12 = (conflictStrategies[p1.bondingKey] && conflictStrategies[p1.bondingKey][p2.bondingKey]) ? conflictStrategies[p1.bondingKey][p2.bondingKey] : "Use weekly check-ins and reflective listening.";
+      var strat21 = (conflictStrategies[p2.bondingKey] && conflictStrategies[p2.bondingKey][p1.bondingKey]) ? conflictStrategies[p2.bondingKey][p1.bondingKey] : "Use weekly check-ins and reflective listening.";
 
-      return `
-        <div class="section-divider"></div>
-        <h3 class="section-title">Couple Comparison</h3>
+      return ''+
+        '<div class="section-divider"></div>'+
+        '<h3 class="section-title">Couple Comparison</h3>'+
 
-        <div class="two-col">
-          <div>
-            <div class="partner-name">${partnerNames[0]}</div>
-            ${block(p1?.priority?.[0]?.[0] || 'Partnership', `<strong>Top Intimacy:</strong> ${p1?.priority?.[0]?.[0] || ''}`)}
-            ${block(p1?.affection?.expressedType || 'AffableExpress', `<strong>Expresses Love:</strong> ${p1?.affection?.expressed || ''}`)}
-            ${block(p1?.affection?.desiredType || 'SupportiveReceive', `<strong>Feels Loved By:</strong> ${p1?.affection?.desired || ''}`)}
-            ${block(p1?.bondingKey || 'SteadyConnector', `<strong>Connection Pattern:</strong> ${p1?.bondingLabel || ''}`)}
-            ${block(p1?.priority?.[0]?.[0] || 'Partnership', `<strong>30-Day Action:</strong> ${actionPlans[p1?.priority?.[0]?.[0] || 'Partnership']?.[p1?.bondingKey || 'SteadyConnector'] || ''}`)}
-          </div>
-          <div>
-            <div class="partner-name">${partnerNames[1]}</div>
-            ${block(p2?.priority?.[0]?.[0] || 'Partnership', `<strong>Top Intimacy:</strong> ${p2?.priority?.[0]?.[0] || ''}`)}
-            ${block(p2?.affection?.expressedType || 'AffableExpress', `<strong>Expresses Love:</strong> ${p2?.affection?.expressed || ''}`)}
-            ${block(p2?.affection?.desiredType || 'SupportiveReceive', `<strong>Feels Loved By:</strong> ${p2?.affection?.desired || ''}`)}
-            ${block(p2?.bondingKey || 'SteadyConnector', `<strong>Connection Pattern:</strong> ${p2?.bondingLabel || ''}`)}
-            ${block(p2?.priority?.[0]?.[0] || 'Partnership', `<strong>30-Day Action:</strong> ${actionPlans[p2?.priority?.[0]?.[0] || 'Partnership']?.[p2?.bondingKey || 'SteadyConnector'] || ''}`)}
-          </div>
-        </div>
+        '<div class="two-col">'+
+          '<div>'+
+            '<div class="partner-name">'+partnerNames[0]+'</div>'+
+            block(p1.priority && p1.priority[0] ? p1.priority[0][0] : 'Partnership', '<strong>Top Intimacy:</strong> '+(p1.priority && p1.priority[0] ? p1.priority[0][0] : ''))+
+            block(p1.affection && p1.affection.expressedType ? p1.affection.expressedType : 'AffableExpress', '<strong>Expresses Love:</strong> '+(p1.affection ? p1.affection.expressed : ''))+
+            block(p1.affection && p1.affection.desiredType ? p1.affection.desiredType : 'SupportiveReceive', '<strong>Feels Loved By:</strong> '+(p1.affection ? p1.affection.desired : ''))+
+            block(p1.bondingKey || 'SteadyConnector', '<strong>Connection Pattern:</strong> '+(p1.bondingLabel || ''))+
+            block(p1.priority && p1.priority[0] ? p1.priority[0][0] : 'Partnership', '<strong>30-Day Action:</strong> '+((actionPlans[p1.priority && p1.priority[0] ? p1.priority[0][0] : 'Partnership'] || {})[p1.bondingKey || 'SteadyConnector'] || ''))+
+          '</div>'+
+          '<div>'+
+            '<div class="partner-name">'+partnerNames[1]+'</div>'+
+            block(p2.priority && p2.priority[0] ? p2.priority[0][0] : 'Partnership', '<strong>Top Intimacy:</strong> '+(p2.priority && p2.priority[0] ? p2.priority[0][0] : ''))+
+            block(p2.affection && p2.affection.expressedType ? p2.affection.expressedType : 'AffableExpress', '<strong>Expresses Love:</strong> '+(p2.affection ? p2.affection.expressed : ''))+
+            block(p2.affection && p2.affection.desiredType ? p2.affection.desiredType : 'SupportiveReceive', '<strong>Feels Loved By:</strong> '+(p2.affection ? p2.affection.desired : ''))+
+            block(p2.bondingKey || 'SteadyConnector', '<strong>Connection Pattern:</strong> '+(p2.bondingLabel || ''))+
+            block(p2.priority && p2.priority[0] ? p2.priority[0][0] : 'Partnership', '<strong>30-Day Action:</strong> '+((actionPlans[p2.priority && p2.priority[0] ? p2.priority[0][0] : 'Partnership'] || {})[p2.bondingKey || 'SteadyConnector'] || ''))+
+          '</div>'+
+        '</div>'+
 
-        <div class="subsection-divider"></div>
-        <h4 class="subsection-title">Top-4 Intimacy: Overlap & Differences</h4>
-        <div class="table-responsive">
-          <table>
-            <tr><th>Overlap</th><th>Only ${partnerNames[0]}</th><th>Only ${partnerNames[1]}</th></tr>
-            <tr>
-              <td>${overlap.length ? overlap.join(', ') : 'None'}</td>
-              <td>${only1.length ? only1.join(', ') : 'None'}</td>
-              <td>${only2.length ? only2.join(', ') : 'None'}</td>
-            </tr>
-          </table>
-        </div>
-        <div class="discussion-prompts">
-          <h5>Discussion Prompts</h5>
-          <ul><li>Plan one ‘overlap’ date this week; choose one “only” from each partner next week.</li></ul>
-        </div>
+        '<div class="subsection-divider"></div>'+
+        '<h4 class="subsection-title">Top-4 Intimacy: Overlap & Differences</h4>'+
+        '<div class="table-responsive"><table><tr><th>Overlap</th><th>Only '+partnerNames[0]+'</th><th>Only '+partnerNames[1]+'</th></tr>'+
+        '<tr><td>'+ (overlap.length ? overlap.join(', ') : 'None') +'</td><td>'+ (only1.length ? only1.join(', ') : 'None') +'</td><td>'+ (only2.length ? only2.join(', ') : 'None') +'</td></tr></table></div>'+
+        '<div class="discussion-prompts"><h5>Discussion Prompts</h5><ul><li>Plan one ‘overlap’ date this week; choose one “only” from each partner next week.</li></ul></div>'+
 
-        <div class="subsection-divider"></div>
-        <h4 class="subsection-title">Affection Alignment</h4>
-        <div class="two-col">
-          ${block('AffableExpress', `<strong>${partnerNames[0]} → ${partnerNames[1]}:</strong> ${youFillThem}`)}
-          ${block('SupportiveExpress', `<strong>${partnerNames[1]} → ${partnerNames[0]}:</strong> ${theyFillYou}`)}
-        </div>
-        <div class="discussion-prompts"><h5>Discussion Prompts</h5><ul><li>What’s one weekly practice each of you will do to meet the other’s desired style?</li></ul></div>
+        '<div class="subsection-divider"></div>'+
+        '<h4 class="subsection-title">Affection Alignment</h4>'+
+        '<div class="two-col">'+
+          block('AffableExpress', '<strong>'+partnerNames[0]+' → '+partnerNames[1]+':</strong> '+youFillThem)+
+          block('SupportiveExpress', '<strong>'+partnerNames[1]+' → '+partnerNames[0]+':</strong> '+theyFillYou)+
+        '</div>'+
+        '<div class="discussion-prompts"><h5>Discussion Prompts</h5><ul><li>What’s one weekly practice each of you will do to meet the other’s desired style?</li></ul></div>'+
 
-        <div class="subsection-divider"></div>
-        <h4 class="subsection-title">Personalized Conflict Resolution Strategies</h4>
-        <div class="table-responsive">
-          <table>
-            <tr><th>Partner</th><th>Pattern</th><th>Strategy With Other</th></tr>
-            <tr><td>${partnerNames[0]}</td><td>${p1?.bondingLabel || ''}</td><td>${strat12}</td></tr>
-            <tr><td>${partnerNames[1]}</td><td>${p2?.bondingLabel || ''}</td><td>${strat21}</td></tr>
-          </table>
-        </div>
-      `;
+        '<div class="subsection-divider"></div>'+
+        '<h4 class="subsection-title">Personalized Conflict Resolution Strategies</h4>'+
+        '<div class="table-responsive"><table><tr><th>Partner</th><th>Pattern</th><th>Strategy With Other</th></tr>'+
+        '<tr><td>'+partnerNames[0]+'</td><td>'+ (p1.bondingLabel || '') +'</td><td>'+strat12+'</td></tr>'+
+        '<tr><td>'+partnerNames[1]+'</td><td>'+ (p2.bondingLabel || '') +'</td><td>'+strat21+'</td></tr>'+
+        '</table></div>'
+      ;
     }
 
     function renderResults() {
-      const results = $('results');
-      const coupleResults = $('coupleResults');
+      var results = $('results');
+      var coupleResults = $('coupleResults');
       results.innerHTML = '';
       coupleResults.innerHTML = '';
 
-      const title5 = "30-Day Discussion & Strategy";
-      const title6 = "Partner Alignment Discussion";
+      var title5 = "30-Day Discussion & Strategy";
+      var title6 = "Partner Alignment Discussion";
 
-      if (mode === 'individual') {
-        const p = partnerProfiles[0] || computeProfile();
+      var haveP1 = !!partnerProfiles[0];
+      var haveP2 = !!partnerProfiles[1];
+
+      if (mode === 'individual' || (mode === 'couple' && haveP1 && !haveP2)) {
+        var p = haveP1 ? partnerProfiles[0] : computeProfile();
         results.innerHTML = renderSingleProfile(p, partnerNames[0] || 'You');
-        results.innerHTML += `
-          <div class="section-divider"></div>
-          <h3 class="section-title">${title5}</h3>
-          ${scriptureLine(title5)}
-          <p class="intro-text">Use your top intimacy (${p?.priority?.[0]?.[0] || '—'}) and connection pattern (${p?.bondingLabel || '—'}) to co-create a plan.</p>
-          <div class="discussion-prompts"><h5>Discussion Prompts</h5><ul>
-            <li>One small step this week that fits ${p?.priority?.[0]?.[0] || 'your top area'}?</li>
-            <li>How will we support each other given our pattern (${p?.bondingLabel || '—'})?</li>
-            <li>When will we check in to review progress?</li>
-          </ul></div>
+        results.innerHTML += ''+
+          '<div class="section-divider"></div>'+
+          '<h3 class="section-title">'+title5+'</h3>'+
+          scriptureLine(title5)+
+          '<p class="intro-text">Use your top intimacy ('+(p.priority && p.priority[0] ? p.priority[0][0] : '—')+') and connection pattern ('+(p.bondingLabel || '—')+') to co-create a plan.</p>'+
+          '<div class="discussion-prompts"><h5>Discussion Prompts</h5><ul>'+
+          '<li>One small step this week that fits '+(p.priority && p.priority[0] ? p.priority[0][0] : 'your top area')+'?</li>'+
+          '<li>How will we support each other given our pattern ('+(p.bondingLabel || '—')+')?</li>'+
+          '<li>When will we check in to review progress?</li>'+
+          '</ul></div>';
 
-          <div class="section-divider"></div>
-          <h3 class="section-title">${title6}</h3>
-          ${scriptureLine(title6)}
-          <p class="intro-text">If you’re taking this with your spouse, use these to align and plan.</p>
-          <div class="discussion-prompts"><h5>Discussion Prompts</h5><ul>
-            <li>Where do we naturally overlap? How can we lean into that this week?</li>
-            <li>Which differences can we celebrate and take turns practicing?</li>
-            <li>What shared goal will we commit to over the next 30 days?</li>
-          </ul></div>
-        `;
+        // Show “Add Partner 2” banner if in couple mode and only P1 exists
+        if (mode === 'couple' && haveP1 && !haveP2) {
+          $('afterP1Banner').classList.remove('hidden');
+          $('startP2Btn').onclick = function(){
+            $('afterP1Banner').classList.add('hidden');
+            currentPartnerIndex = 1;
+            // Pre-fill names and lock fields
+            $('introPage').classList.remove('hidden');
+            $('mode').value = 'couple';
+            $('coupleFields').classList.remove('hidden');
+            $('p1Name').value = partnerNames[0];
+            $('p2Name').value = partnerNames[1];
+            $('p1Name').setAttribute('disabled','true');
+            $('p2Name').setAttribute('disabled','true');
+            $('startQuizBtn').textContent = "Start " + partnerNames[1] + "'s Assessment";
+            $('resultPage').classList.add('hidden');
+            // Start Partner 2 on click
+            $('startQuizBtn').onclick = function(){
+              startPartnerRun();
+              // restore default handler after starting partner 2
+              setTimeout(function(){
+                $('startQuizBtn').onclick = null;
+              }, 0);
+            };
+          };
+          $('keepSoloBtn').onclick = function(){
+            $('afterP1Banner').classList.add('hidden');
+          };
+        }
       } else {
-        const p1 = partnerProfiles[0] || computeProfile();
-        const p2 = partnerProfiles[1] || computeProfile();
+        var p1 = partnerProfiles[0] || computeProfile();
+        var p2 = partnerProfiles[1] || computeProfile();
         results.innerHTML =
           renderSingleProfile(p1, partnerNames[0] || 'Partner 1') +
           renderSingleProfile(p2, partnerNames[1] || 'Partner 2');
         coupleResults.innerHTML = renderCoupleComparison(p1, p2);
 
-        coupleResults.innerHTML += `
-          <div class="section-divider"></div>
-          <h3 class="section-title">${title5}</h3>
-          ${scriptureLine(title5)}
-          <p class="intro-text">Build a 30-day plan that honors ${partnerNames[0]}'s top intimacy (${p1?.priority?.[0]?.[0] || '—'}) and ${partnerNames[1]}'s top intimacy (${p2?.priority?.[0]?.[0] || '—'}).</p>
-          <div class="discussion-prompts"><h5>Discussion Prompts</h5><ul>
-            <li>One shared practice that fits both top intimacies?</li>
-            <li>One weekly action each of you will take to meet the other’s desired style?</li>
-            <li>When will you check in, and how will you celebrate progress?</li>
-          </ul></div>
+        coupleResults.innerHTML += ''+
+          '<div class="section-divider"></div>'+
+          '<h3 class="section-title">'+title5+'</h3>'+
+          scriptureLine(title5)+
+          '<p class="intro-text">Build a 30-day plan that honors '+partnerNames[0]+"'s top intimacy ("+(p1.priority && p1.priority[0] ? p1.priority[0][0] : '—')+') and '+partnerNames[1]+"'s top intimacy ("+(p2.priority && p2.priority[0] ? p2.priority[0][0] : '—')+').</p>'+
+          '<div class="discussion-prompts"><h5>Discussion Prompts</h5><ul>'+
+          '<li>One shared practice that fits both top intimacies?</li>'+
+          '<li>One weekly action each of you will take to meet the other’s desired style?</li>'+
+          '<li>When will you check in, and how will you celebrate progress?</li>'+
+          '</ul></div>'+
 
-          <div class="section-divider"></div>
-          <h3 class="section-title">${title6}</h3>
-          ${scriptureLine(title6)}
-          <p class="intro-text">Use overlap and differences to design a rhythm that works for both.</p>
-          <div class="discussion-prompts"><h5>Discussion Prompts</h5><ul>
-            <li>Choose one ‘overlap’ activity for this week.</li>
-            <li>Pick one “only ${partnerNames[0]}” and one “only ${partnerNames[1]}” activity for alternating weeks.</li>
-            <li>Agree on a quick weekly check-in (time + 2 questions) to adjust your plan.</li>
-          </ul></div>
-        `;
+          '<div class="section-divider"></div>'+
+          '<h3 class="section-title">'+title6+'</h3>'+
+          scriptureLine(title6)+
+          '<p class="intro-text">Use overlap and differences to design a rhythm that works for both.</p>'+
+          '<div class="discussion-prompts"><h5>Discussion Prompts</h5><ul>'+
+          '<li>Choose one ‘overlap’ activity for this week.</li>'+
+          '<li>Pick one “only '+partnerNames[0]+'” and one “only '+partnerNames[1]+'” activity for alternating weeks.</li>'+
+          '<li>Agree on a quick weekly check-in (time + 2 questions) to adjust your plan.</li>'+
+          '</ul></div>';
       }
 
-      $('quizPage')?.classList.add('hidden');
-      $('resultPage')?.classList.remove('hidden');
+      $('quizPage').classList.add('hidden');
+      $('resultPage').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function finishPartnerRun() {
-      const profile = computeProfile();
+      var profile = computeProfile();
       partnerProfiles[currentPartnerIndex] = profile;
 
-      if (mode === 'couple' && currentPartnerIndex === 0) {
-        $('quizPage')?.classList.add('hidden');
-        $('introPage')?.classList.remove('hidden');
-        $('mode').value = 'couple';
-        $('coupleFields').classList.remove('hidden');
-        const btn = $('startQuizBtn');
-        btn.textContent = `Start ${partnerNames[1]}'s Assessment`;
-        currentPartnerIndex = 1;
-        $('p1Name').setAttribute('disabled','true');
-        $('p2Name').setAttribute('disabled','true');
-        btn.onclick = () => startPartnerRun();
-      } else {
-        renderResults();
-      }
+      // ALWAYS show results after a run
+      renderResults();
+
+      // If we’re in true couple flow and just finished P1, the banner lets them start P2.
+      // If they proceed to P2 via banner, startPartnerRun() will run.
     }
   </script>
 </body>
