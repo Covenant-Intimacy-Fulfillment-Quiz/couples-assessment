@@ -434,12 +434,20 @@
     }
 
     /* ================== UI Wiring ================== */
+      <script defer>
     document.addEventListener("DOMContentLoaded", () => {
       const coupleToggle = document.getElementById("coupleModeToggle");
-      coupleToggle.addEventListener("change", () => {
-        document.getElementById("partnerBName").classList.toggle("hidden", !coupleToggle.checked);
-        mode = coupleToggle.checked ? "couple" : "solo";
-      });
+      const partnerBInput = document.getElementById("partnerBName");
+
+      function toggleCoupleMode() {
+        const isCouple = coupleToggle.checked;
+        partnerBInput.classList.toggle("hidden", !isCouple);
+        mode = isCouple ? "couple" : "solo";
+      }
+
+      coupleToggle.addEventListener("change", toggleCoupleMode);
+      toggleCoupleMode(); // In case checkbox is already checked
+
       document.getElementById("startQuizBtn").addEventListener("click", startQuiz);
     });
 
@@ -681,7 +689,6 @@
     </div>
   `;
 }
-
 
       return `
         <div class="partner-header">${p.name}</div>
