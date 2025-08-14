@@ -228,7 +228,6 @@
     };
 
     const scripture = {
-      coreIntro: "“Two are better than one, because they have a good return for their labor.” — Ecclesiastes 4:9",
       coreStrengths: "“Above all, love each other deeply, because love covers over a multitude of sins.” — 1 Peter 4:8",
       areasForGrowth: "“Let us consider how we may spur one another on toward love and good deeds.” — Hebrews 10:24",
       untappedOpps: "“See, I am doing a new thing! … Do you not perceive it?” — Isaiah 43:19",
@@ -416,6 +415,12 @@
       return Object.entries(bondingScores).sort((a,b)=>b[1]-a[1])[0]?.[0] || "SteadyConnector";
     }
 
+    function rrLabel(score){
+      if(score >= 5) return "Strong";
+      if(score >= 3) return "Moderate";
+      return "Needs Attention";
+    }
+
     /* ================== UI Wiring ================== */
     document.addEventListener("DOMContentLoaded", () => {
       const coupleToggle = document.getElementById("coupleModeToggle");
@@ -424,7 +429,7 @@
       function toggleCoupleMode() {
         const isCouple = coupleToggle.checked;
         partnerBInput.classList.toggle("hidden", !isCouple);
-        mode = isCouple ? "couple" : "solo"; // keep mode in sync
+        mode = isCouple ? "couple" : "solo";
       }
 
       coupleToggle.addEventListener("change", toggleCoupleMode);
@@ -489,7 +494,7 @@
       showQuestion();
     }
 
-    /* ================== Build Blocks ================== */
+    /* ================== Helpers for blocks ================== */
     function itemsBlocks(items){
       return items.map(([type])=>`
         <div class="result-block" style="border-left:8px solid ${typeColors[type]}; background:${typeColorsWithOpacity[type]};">
@@ -522,35 +527,6 @@
       `;
     }
 
-    function buildRelationalDynamicsSection(A,B){
-      const col = (p)=>`
-        <div class="partner-card"><div class="partner-inner">
-          <div class="partner-header">${p.name}</div>
-          <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.expressedType]}; background:${typeColorsWithOpacity[p.affectionPrefs.expressedType]};">
-            <strong>How You Express Love:</strong> ${p.affectionPrefs.expressed}
-          </div>
-          <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.desiredType]}; background:${typeColorsWithOpacity[p.affectionPrefs.desiredType]};">
-            <strong>How You Feel Loved:</strong> ${p.affectionPrefs.desired}
-          </div>
-          <div class="result-block" style="border-left:8px solid #FFB347; background:rgba(255,179,71,0.08);">
-            <strong>Your Social Style:</strong> ${p.socialPreferences}
-          </div>
-          <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);">
-            <strong>Your Decision Style:</strong> ${p.decisionLeadershipStyle}
-          </div>
-        </div></div>
-      `;
-      return `
-        <div class="section-divider"></div>
-        <h3 class="section-title">Relational Dynamics</h3>
-        <div class="verse">${scripture.compassionCare}</div>
-        <p class="intro-text">Expressing and receiving love, social energy, and decision style shape your daily connection. Share what “lands” for you and align expectations to protect closeness.</p>
-        <div class="couple-grid">
-          ${col(A)}${col(B)}
-        </div>
-      `;
-    }
-
     function buildConnectionPatternsSection(A,B){
       const col = (p)=>`
         <div class="partner-card"><div class="partner-inner">
@@ -565,7 +541,7 @@
       `;
       return `
         <div class="section-divider"></div>
-        <h3 class="section-title">Connection Patterns</h3>
+        <h3 class="section-title">Section 4: Connection Patterns</h3>
         <div class="verse">${scripture.connectionPattern}</div>
         <p class="intro-text">Name the pattern, then use it wisely—maximize the strength and watch the blind spots when tension rises.</p>
         <div class="couple-grid">
@@ -574,7 +550,27 @@
       `;
     }
 
-    /* ================== Summarize Profile ================== */
+    /* ================== Solo page ================== */
+    function listBlocksWithIntro(title, verseKey, intro, items){
+      return `
+        <div class="subsection-divider"></div>
+        <h4 class="subsection-title">${title}</h4>
+        <div class="verse">${scripture[verseKey]}</div>
+        <p class="intro-text">${intro}</p>
+        ${items.map(([type])=>`
+          <div class="result-block" style="border-left:8px solid ${typeColors[type]}; background:${typeColorsWithOpacity[type]};">
+            <strong>${type}</strong> – ${intimacyDescriptions[type].desc}
+          </div>`).join("")}
+        <div class="discussion-prompts">
+          <strong>Discussion Prompts:</strong>
+          <ul class="results-list">
+            <li>Steward your strengths—use them intentionally twice this week.</li>
+            <li>Pick one simple practice to try in this area and schedule it.</li>
+          </ul>
+        </div>
+      `;
+    }
+
     function buildSoloHTML(nameLabel){
       const normalized = normalizeIntimacyScores();
       const sorted = Object.entries(normalized).sort((a,b)=>b[1]-a[1]);
@@ -629,7 +625,9 @@
       const decisionLeadershipStyle = getDecisionLeadershipStyle();
       const bondingKey = getBondingStyle();
       const bondingLabel = bondingKey.replace(/([a-z])([A-Z])/g,'$1 $2');
-      return { priority, progress, presence, affectionPrefs, socialPreferences, decisionLeadershipStyle, bondingKey, bondingLabel };
+      const rrScore = respectRecognitionScore;
+      const rrLabelTxt = rrLabel(rrScore);
+      return { priority, progress, presence, affectionPrefs, socialPreferences, decisionLeadershipStyle, bondingKey, bondingLabel, respectRecognitionScore: rrScore, respectRecognitionLabel: rrLabelTxt };
     }
 
     /* ================== Couples Rendering ================== */
@@ -667,6 +665,99 @@
       `;
     }
 
+    function buildSection3RelationalDynamics(A,B){
+      const expressBlock = (p)=>`
+        <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.expressedType]}; background:${typeColorsWithOpacity[p.affectionPrefs.expressedType]};">
+          <strong>How You Express Love:</strong> ${p.affectionPrefs.expressed}
+        </div>
+        <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.desiredType]}; background:${typeColorsWithOpacity[p.affectionPrefs.desiredType]};">
+          <strong>How You Feel Most Loved:</strong> ${p.affectionPrefs.desired}
+        </div>
+      `;
+      const socialBlock = (p)=>`
+        <div class="result-block" style="border-left:8px solid #FFB347; background:rgba(255,179,71,0.08);">
+          <strong>Your Social Energy:</strong> ${p.socialPreferences}
+        </div>
+      `;
+      const powerBlock = (p)=>`
+        <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);">
+          <strong>Your Leadership Style:</strong> ${p.decisionLeadershipStyle}
+        </div>
+      `;
+      const rrBlock = (p)=>`
+        <div class="result-block" style="border-left:8px solid #6A4C93; background:rgba(106,76,147,0.08);">
+          <strong>Your Respect &amp; Recognition:</strong> ${p.respectRecognitionLabel} (${p.respectRecognitionScore}/6)
+        </div>
+      `;
+
+      return `
+        <div class="section-divider"></div>
+        <h3 class="section-title">Section 3: Relational Dynamics</h3>
+        <div class="verse">“Be completely humble and gentle; be patient, bearing with one another in love.”— Ephesians 4:2</div>
+        <p class="intro-text">Your relational dynamics are the everyday rhythms of your connection—how you express love, engage socially, and make decisions together. By understanding and embracing these differences, you can protect your closeness and build a deeper connection. Understanding these dynamics can provide insight into the core drivers of your interactions and motivations. Let's explore what makes your relationship uniquely yours!</p>
+
+        <div class="subsection-divider"></div>
+        <h4 class="subsection-title">Compassion and Care</h4>
+        <p class="intro-text">This dynamic represents your innate capacity to show empathy, concern, and kindness toward one another. It measures how you tend to express nurturing support and how you desire to receive care and comfort in your relationship.</p>
+        <div class="couple-grid">
+          <div class="partner-card"><div class="partner-inner"><div class="partner-header">${A.name}</div>${expressBlock(A)}</div></div>
+          <div class="partner-card"><div class="partner-inner"><div class="partner-header">${B.name}</div>${expressBlock(B)}</div></div>
+        </div>
+        <div class="discussion-prompts">
+          <strong>Discussion Prompts: Let's Show Up for Each Other</strong>
+          <ul class="results-list">
+            <li><em>A "Love Note" to Each Other:</em> Based on your spouse's "How You Feel Most Loved" result, write them a short note of appreciation or an idea for how you could intentionally love them in that way this week.</li>
+            <li><em>A Curious Question:</em> Ask your spouse, "What's a small, unexpected thing I could do that would make you feel especially cared for today?"</li>
+          </ul>
+        </div>
+
+        <div class="subsection-divider"></div>
+        <h4 class="subsection-title">Social Preferences</h4>
+        <p class="intro-text">This dynamic explores how you prefer to engage with the world around you, specifically regarding your social interactions. It reveals whether you are energized by being with others (extraversion), find renewal in solitude (introversion) or a little bit of both (ambivert). This is how you recharge and engage socially, helping you and your spouse balance connection and personal space.</p>
+        <div class="couple-grid">
+          <div class="partner-card"><div class="partner-inner"><div class="partner-header">${A.name}</div>${socialBlock(A)}</div></div>
+          <div class="partner-card"><div class="partner-inner"><div class="partner-header">${B.name}</div>${socialBlock(B)}</div></div>
+        </div>
+        <div class="discussion-prompts">
+          <strong>Discussion Prompts: Let's Find Our Rhythm</strong>
+          <ul class="results-list">
+            <li><em>The Best of Both Worlds:</em> Discuss a time when you felt truly energized by a social activity and a time when you felt truly renewed by quiet time. How can we make space for both in our life as a couple?</li>
+            <li><em>A "We" and "Me" Plan:</em> Let's plan one activity we can do together this week that honors our social energy, and one thing each of us can do alone that helps us recharge.</li>
+          </ul>
+        </div>
+
+        <div class="subsection-divider"></div>
+        <h4 class="subsection-title">Power and Control</h4>
+        <p class="intro-text">This dynamic uncovers your comfort level with influence and authority within a relationship. It reflects how you navigate decision-making, manage responsibilities, and how you respond to direction from others. Use this awareness to ensure balance, shared respect, and collaboration.</p>
+        <div class="couple-grid">
+          <div class="partner-card"><div class="partner-inner"><div class="partner-header">${A.name}</div>${powerBlock(A)}</div></div>
+          <div class="partner-card"><div class="partner-inner"><div class="partner-header">${B.name}</div>${powerBlock(B)}</div></div>
+        </div>
+        <div class="discussion-prompts">
+          <strong>Discussion Prompts: A Power &amp; Trust Talk</strong>
+          <ul class="results-list">
+            <li><em>A Shared Goal:</em> Think about a decision you need to make this week, big or small. Discuss how you can use your different leadership styles to make the best decision together.</li>
+            <li><em>A Trust Check-in:</em> Ask your spouse, "When do you feel most respected and trusted in our decision-making process?" Listen to their answer and share your own.</li>
+          </ul>
+        </div>
+
+        <div class="subsection-divider"></div>
+        <h4 class="subsection-title">Respect and Recognition</h4>
+        <p class="intro-text">This dynamic highlights your desire for affirmation and validation. It indicates how you seek to be valued and esteemed by your partner, and how you, in turn, show appreciation and honor to them.</p>
+        <div class="couple-grid">
+          <div class="partner-card"><div class="partner-inner"><div class="partner-header">${A.name}</div>${rrBlock(A)}</div></div>
+          <div class="partner-card"><div class="partner-inner"><div class="partner-header">${B.name}</div>${rrBlock(B)}</div></div>
+        </div>
+        <div class="discussion-prompts">
+          <strong>Discussion Prompts: Let's Celebrate Each Other!</strong>
+          <ul class="results-list">
+            <li><em>A "High Five" Moment:</em> Think back to a time this week when you felt genuinely appreciated by your spouse. Share that specific moment and why it meant so much to you.</li>
+            <li><em>The "One Thing" Challenge:</em> Each of you share one new, specific way you will show respect and recognition to your spouse this week, based on their results. Then, try to do it!</li>
+          </ul>
+        </div>
+      `;
+    }
+
     function renderCoupleComparison(){
       const A = profiles[0], B = profiles[1];
 
@@ -686,7 +777,7 @@
           promptsHtml: `
             <ul class="results-list">
               <li><em>Explore:</em> Share why each strength matters and when you feel most connected in that way.</li>
-              <li><em>Be Creative:</em> Trade lists of ideas to practice one of your spouse’s strengths this week, then pick one.</li>
+              <li><em>Be Creative:</em> Trade ideas to practice one of your spouse’s strengths this week, then pick one.</li>
               <li><em>Share:</em> What did you learn about how your spouse feels most connected?</li>
             </ul>`
         },
@@ -720,7 +811,7 @@
       // Section 1 – CIFM overview
       container.innerHTML = section1CIFM();
 
-      // Overview of top strengths (kept)
+      // Overview of top strengths
       container.innerHTML += `
         <div class="section-divider"></div>
         <h3 class="section-title">Intimacy Type Strengths</h3>
@@ -741,27 +832,24 @@
         </div>
       `;
 
-      // Section 2 – requested format (scripture + intro → side-by-side lists → prompts)
+      // Section 2 – requested format
       container.innerHTML += `
         <div class="section-divider"></div>
         <h3 class="section-title">Section 2: Your Intimacy Preferences</h3>
         <p class="intro-text">This section reveals how you each naturally connect. Use the side-by-side lists to compare patterns and pick one small practice to try this week.</p>
       `;
-
       container.innerHTML += coupleCategorySection(section2Texts.core, A.priority, B.priority, A.name, B.name);
       container.innerHTML += coupleCategorySection(section2Texts.growth, A.progress, B.progress, A.name, B.name);
       container.innerHTML += coupleCategorySection(section2Texts.untapped, A.presence, B.presence, A.name, B.name);
 
-      // Section 3 – Relational Dynamics (grid)
-      container.innerHTML += buildRelationalDynamicsSection(A,B);
+      // Section 3 – Relational Dynamics (your requested layout)
+      container.innerHTML += buildSection3RelationalDynamics(A,B);
 
-      // Section 4 – Connection Patterns (grid)
+      // Section 4 – Connection Patterns
       container.innerHTML += buildConnectionPatternsSection(A,B);
 
-      // Personalized Conflict section
+      // Conflict Section + PDF
       container.innerHTML += couplesConflictSection(A,B);
-
-      // Sections 5 & 6
       container.innerHTML += `
         <div class="section-divider"></div>
         <h3 class="section-title">Section 5: Shared Action Plan</h3>
@@ -809,26 +897,6 @@
     }
 
     /* ================== Results Flow ================== */
-    function listBlocksWithIntro(title, verseKey, intro, items){
-      return `
-        <div class="subsection-divider"></div>
-        <h4 class="subsection-title">${title}</h4>
-        <div class="verse">${scripture[verseKey]}</div>
-        <p class="intro-text">${intro}</p>
-        ${items.map(([type])=>`
-          <div class="result-block" style="border-left:8px solid ${typeColors[type]}; background:${typeColorsWithOpacity[type]};">
-            <strong>${type}</strong> – ${intimacyDescriptions[type].desc}
-          </div>`).join("")}
-        <div class="discussion-prompts">
-          <strong>Discussion Prompts:</strong>
-          <ul class="results-list">
-            <li>Steward your strengths—use them intentionally twice this week.</li>
-            <li>Pick one simple practice to try in this area and schedule it.</li>
-          </ul>
-        </div>
-      `;
-    }
-
     function showResults(){
       document.getElementById('quizPage').classList.add('hidden');
       document.getElementById('resultPage').classList.remove('hidden');
