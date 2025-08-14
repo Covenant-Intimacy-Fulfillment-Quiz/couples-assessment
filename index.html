@@ -125,8 +125,8 @@
         <li>Your Intimacy Preferences (how you connect)</li>
         <li>Relational Dynamics (how you interact)</li>
         <li>Connection &amp; Conflict Insights (how you navigate challenges)</li>
-        <li>A Shared Action Plan (what to do next)</li>
-        <li>A Partner Alignment Worksheet (for side-by-side comparison)</li>
+        <li>Conclusion</li>
+        <li>Your Continuing Connection Challenge</li>
       </ul>
       <p>Each section begins with a brief explanation to help you understand what you're seeing and how to use it. At the end of each section, you will find Discussion Prompts to help you turn these insights into action. We encourage you to use your strengths intentionally and explore one new practice together this week.</p>
 
@@ -236,9 +236,7 @@
       decisionLeadership: "“If any of you lacks wisdom, you should ask God … and it will be given to you.” — James 1:5",
       respectRecognition: "“Honor one another above yourselves.” — Romans 12:10",
       connectionPattern: "“Make every effort to keep the unity of the Spirit through the bond of peace.” — Ephesians 4:3",
-      conflictStrategies: "“Everyone should be quick to listen, slow to speak and slow to become angry.” — James 1:19",
-      sharedPlan: "“Write the vision; make it plain on tablets, so he may run who reads it.” — Habakkuk 2:2",
-      alignmentWorksheet: "“Carry each other’s burdens, and in this way you will fulfill the law of Christ.” — Galatians 6:2"
+      conflictStrategies: "“Everyone should be quick to listen, slow to speak and slow to become angry.” — James 1:19"
     };
 
     /* ================== Questions ================== */
@@ -527,6 +525,7 @@
       `;
     }
 
+    /* ================== Section 4: Connection Patterns (updated) ================== */
     function buildConnectionPatternsSection(A,B){
       const col = (p)=>`
         <div class="partner-card"><div class="partner-inner">
@@ -543,128 +542,14 @@
         <div class="section-divider"></div>
         <h3 class="section-title">Section 4: Connection Patterns</h3>
         <div class="verse">${scripture.connectionPattern}</div>
-        <p class="intro-text">Name the pattern, then use it wisely—maximize the strength and watch the blind spots when tension rises.</p>
+        <p class="intro-text">Everyone has a unique pattern for how they approach connection and conflict. Your results here will illuminate how you tend to respond to perceived tension and how you desire to repair after it. This section is a powerful invitation to understand yourselves and each other better, turning challenging moments into opportunities for deeper connection. We hope these insights provide a helpful starting point for a deeper, more empathetic conversation with your spouse, helping you build a healthier, more resilient relationship.</p>
         <div class="couple-grid">
           ${col(A)}${col(B)}
         </div>
       `;
     }
 
-    /* ================== Solo page ================== */
-    function listBlocksWithIntro(title, verseKey, intro, items){
-      return `
-        <div class="subsection-divider"></div>
-        <h4 class="subsection-title">${title}</h4>
-        <div class="verse">${scripture[verseKey]}</div>
-        <p class="intro-text">${intro}</p>
-        ${items.map(([type])=>`
-          <div class="result-block" style="border-left:8px solid ${typeColors[type]}; background:${typeColorsWithOpacity[type]};">
-            <strong>${type}</strong> – ${intimacyDescriptions[type].desc}
-          </div>`).join("")}
-        <div class="discussion-prompts">
-          <strong>Discussion Prompts:</strong>
-          <ul class="results-list">
-            <li>Steward your strengths—use them intentionally twice this week.</li>
-            <li>Pick one simple practice to try in this area and schedule it.</li>
-          </ul>
-        </div>
-      `;
-    }
-
-    function buildSoloHTML(nameLabel){
-      const normalized = normalizeIntimacyScores();
-      const sorted = Object.entries(normalized).sort((a,b)=>b[1]-a[1]);
-      const priority = sorted.slice(0,4), progress = sorted.slice(4,8), presence = sorted.slice(8,12);
-      const affectionPrefs = getAffectionPreferences();
-      const social = getSocialPreferences();
-      const decision = getDecisionLeadershipStyle();
-      const bondingKey = getBondingStyle();
-      const bondingLabel = bondingKey.replace(/([a-z])([A-Z])/g,'$1 $2');
-
-      return `
-        <div class="section-divider"></div>
-        <h3 class="section-title">Section 1: Exploring the Covenant Intimacy Fulfillment Model™ (CIFM)</h3>
-        <p class="intro-text">The CIFM organizes intimacy into 12 types across four categories that balance “being together” and “doing together”.</p>
-        <ul class="results-list">
-          <li><strong>Core:</strong> Spiritual, Emotional, Commitment</li>
-          <li><strong>Relational:</strong> Intellectual, Affable, Recreational</li>
-          <li><strong>Partnership:</strong> Partnership, Stability, Creative, Conflict</li>
-          <li><strong>Physical:</strong> Physical, Sexual</li>
-        </ul>
-
-        <div class="section-divider"></div>
-        <h3 class="section-title">Section 2: ${nameLabel}'s Intimacy Type Preferences</h3>
-        ${listBlocksWithIntro("Core Connection Strengths","coreStrengths","Your top four intimacy types are your natural “on-ramps” to closeness. Nurturing these areas creates momentum for growth elsewhere.",priority)}
-        ${listBlocksWithIntro("Areas for Growth","areasForGrowth","These are familiar but less dominant. Intentional, modest effort here often unlocks steady gains in connection.",progress)}
-        ${listBlocksWithIntro("Untapped Opportunities","untappedOpps","These are rarely used pathways. Exploring one of them can add a new flavor of intimacy to your marriage.",presence)}
-
-        <div class="section-divider"></div>
-        <h3 class="section-title">Section 3: ${nameLabel}'s Relational Dynamics</h3>
-        <div class="result-block" style="border-left:8px solid ${typeColors[affectionPrefs.expressedType]}; background:${typeColorsWithOpacity[affectionPrefs.expressedType]};"><strong>How You Express Love:</strong> ${affectionPrefs.expressed}</div>
-        <div class="result-block" style="border-left:8px solid ${typeColors[affectionPrefs.desiredType]}; background:${typeColorsWithOpacity[affectionPrefs.desiredType]};"><strong>How You Feel Loved:</strong> ${affectionPrefs.desired}</div>
-        <div class="result-block" style="border-left:8px solid #FFB347; background:rgba(255,179,71,0.08);"><strong>Your Social Style:</strong> ${social}</div>
-        <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);"><strong>Your Decision Style:</strong> ${decision}</div>
-
-        <div class="section-divider"></div>
-        <h3 class="section-title">Section 4: ${nameLabel}'s Connection & Conflict Insights</h3>
-        <div class="result-block" style="border-left:8px solid ${typeColors[bondingKey]}; background:${typeColorsWithOpacity[bondingKey]};">
-          <strong>${bondingLabel}</strong>
-          <p><strong>Strengths:</strong> ${bondingInsights[bondingKey].desc}</p>
-          <p><strong>Challenges:</strong> ${bondingInsights[bondingKey].challenges}</p>
-          <p><strong>Conflict Style:</strong> ${bondingInsights[bondingKey].conflictStyle}</p>
-        </div>
-      `;
-    }
-
-    function summarizeForProfile(){
-      const normalized = normalizeIntimacyScores();
-      const sorted = Object.entries(normalized).sort((a,b)=>b[1]-a[1]);
-      const priority = sorted.slice(0,4), progress = sorted.slice(4,8), presence = sorted.slice(8,12);
-      const affectionPrefs = getAffectionPreferences();
-      const socialPreferences = getSocialPreferences();
-      const decisionLeadershipStyle = getDecisionLeadershipStyle();
-      const bondingKey = getBondingStyle();
-      const bondingLabel = bondingKey.replace(/([a-z])([A-Z])/g,'$1 $2');
-      const rrScore = respectRecognitionScore;
-      const rrLabelTxt = rrLabel(rrScore);
-      return { priority, progress, presence, affectionPrefs, socialPreferences, decisionLeadershipStyle, bondingKey, bondingLabel, respectRecognitionScore: rrScore, respectRecognitionLabel: rrLabelTxt };
-    }
-
-    /* ================== Couples Rendering ================== */
-    function section1CIFM(){
-      return `
-        <div class="section-divider"></div>
-        <h3 class="section-title">Section 1: Exploring the Covenant Intimacy Fulfillment Model™ (CIFM)</h3>
-        <p class="intro-text">The CIFM organizes intimacy into 12 types across four categories balancing “being together” and “doing together.” It gives you a shared language for how connection grows over time.</p>
-        <ul class="results-list">
-          <li><strong>Core:</strong> Spiritual, Emotional, Commitment</li>
-          <li><strong>Relational:</strong> Intellectual, Affable, Recreational</li>
-          <li><strong>Partnership:</strong> Partnership, Stability, Creative, Conflict</li>
-          <li><strong>Physical:</strong> Physical, Sexual</li>
-        </ul>
-      `;
-    }
-
-    function couplesConflictSection(A,B){
-      const aToB = conflictStrategies[A.bondingKey][B.bondingKey];
-      const bToA = conflictStrategies[B.bondingKey][A.bondingKey];
-      const shared = `Blend both: ${aToB} Also, ${bToA}. Agree on a weekly check-in and a “pause & return” window.`;
-      return `
-        <div class="section-divider"></div>
-        <h3 class="section-title">Personalized Conflict Resolution Strategies</h3>
-        <div class="verse">${scripture.conflictStrategies}</div>
-        <p class="intro-text">Bring out the best in each other during tension. These strategies are tailored to your connection patterns.</p>
-        <table>
-          <tr><th>Partner</th><th>Style</th><th>Opposite Partner</th><th>Strategy</th></tr>
-          <tr><td>${A.name}</td><td>${A.bondingLabel}</td><td>${B.name} (${B.bondingLabel})</td><td>${aToB}</td></tr>
-          <tr><td>${B.name}</td><td>${B.bondingLabel}</td><td>${A.name} (${A.bondingLabel})</td><td>${bToA}</td></tr>
-        </table>
-        <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);">
-          <strong>Shared Strategy:</strong> ${shared}
-        </div>
-      `;
-    }
-
+    /* ================== Section 3: Relational Dynamics (unchanged structure per your spec) ================== */
     function buildSection3RelationalDynamics(A,B){
       const expressBlock = (p)=>`
         <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.expressedType]}; background:${typeColorsWithOpacity[p.affectionPrefs.expressedType]};">
@@ -758,6 +643,43 @@
       `;
     }
 
+    /* ================== Couples Rendering ================== */
+    function section1CIFM(){
+      return `
+        <div class="section-divider"></div>
+        <h3 class="section-title">Section 1: Exploring the Covenant Intimacy Fulfillment Model™ (CIFM)</h3>
+        <p class="intro-text">The CIFM organizes intimacy into 12 types across four categories balancing “being together” and “doing together.” It gives you a shared language for how connection grows over time.</p>
+        <ul class="results-list">
+          <li><strong>Core:</strong> Spiritual, Emotional, Commitment</li>
+          <li><strong>Relational:</strong> Intellectual, Affable, Recreational</li>
+          <li><strong>Partnership:</strong> Partnership, Stability, Creative, Conflict</li>
+          <li><strong>Physical:</strong> Physical, Sexual</li>
+        </ul>
+      `;
+    }
+
+    function couplesConflictSection(A,B){
+      const aToB = conflictStrategies[A.bondingKey][B.bondingKey];
+      const bToA = conflictStrategies[B.bondingKey][A.bondingKey];
+      const shared = `This is where the rubber meets the road! Understanding your individual patterns is powerful, but the real magic happens when you work together to create a joint plan that honors both of your needs. The goal isn't to change who you are, but to create a bridge between your natural responses, fostering safety and understanding during moments of tension.`;
+
+      return `
+        <div class="section-divider"></div>
+        <h3 class="section-title">Personalized Conflict Resolution Strategies</h3>
+        <div class="verse">${scripture.conflictStrategies}</div>
+        <p class="intro-text">When tension arises, our natural responses can sometimes create distance instead of resolution. This section offers personalized strategies designed to help you bring out the best in each other, even when things feel tough. These insights are tailored to your unique connection patterns and how you tend to respond under pressure – whether you lean towards needing space to process, or needing immediate reassurance and closeness.</p>
+        <table>
+          <tr><th>Partner</th><th>Style</th><th>Strategy</th></tr>
+          <tr><td>${A.name}</td><td>${A.bondingLabel}</td><td>${aToB}</td></tr>
+          <tr><td>${B.name}</td><td>${B.bondingLabel}</td><td>${bToA}</td></tr>
+        </table>
+        <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);">
+          <strong>Shared Strategy: Bridging Our Needs</strong>
+          <p>${shared}</p>
+        </div>
+      `;
+    }
+
     function renderCoupleComparison(){
       const A = profiles[0], B = profiles[1];
 
@@ -842,33 +764,26 @@
       container.innerHTML += coupleCategorySection(section2Texts.growth, A.progress, B.progress, A.name, B.name);
       container.innerHTML += coupleCategorySection(section2Texts.untapped, A.presence, B.presence, A.name, B.name);
 
-      // Section 3 – Relational Dynamics (your requested layout)
+      // Section 3 – Relational Dynamics
       container.innerHTML += buildSection3RelationalDynamics(A,B);
 
-      // Section 4 – Connection Patterns
+      // Section 4 – Connection Patterns (with new description), then Conflict Strategies (with new copy/table)
       container.innerHTML += buildConnectionPatternsSection(A,B);
-
-      // Conflict Section + PDF
       container.innerHTML += couplesConflictSection(A,B);
+
+      // Conclusion (replaces old Section 5)
       container.innerHTML += `
         <div class="section-divider"></div>
-        <h3 class="section-title">Section 5: Shared Action Plan</h3>
-        <div class="verse">${scripture.sharedPlan}</div>
-        <ul class="results-list">
-          <li><strong>Primary:</strong> Choose one activity that feeds a shared strength from your overlap list.</li>
-          <li><strong>Secondary:</strong> Choose one “Untapped Opportunity” from each partner to explore together.</li>
-          <li><strong>Weekly Rhythm:</strong> Set a 15-minute check-in to reflect and adjust.</li>
-        </ul>
+        <h3 class="section-title">Conclusion</h3>
+        <p class="intro-text">We hope you had fun diving deep and discovering your unique connection types on multiple levels! Remember, this has been a friendly, beginner's assessment, designed not to label you, but to inspire the sparks of connection and help your marriage explore the beautiful, unique individuals within it. Use these insights as a fun tool for introspection and spouse discovery, opening up new conversations and drawing you closer. After all, to truly be known is to experience the deepest intimacy, leading you to name what's true in your relationship today and powerfully aim for what's possible tomorrow—growing in the lasting love and joy-filled fulfillment that God designed for your marriage.</p>
+      `;
 
+      // Your Continuing Connection Challenge (replaces old Section 6)
+      container.innerHTML += `
         <div class="section-divider"></div>
-        <h3 class="section-title">Section 6: Partner Alignment Worksheet</h3>
-        <div class="verse">${scripture.alignmentWorksheet}</div>
-        <ul class="results-list">
-          <li><strong>Overlap:</strong> Plan one date around a shared Core strength.</li>
-          <li><strong>Balance:</strong> Alternate preferences to celebrate differences.</li>
-          <li><strong>Conflicts:</strong> Adopt your Shared Strategy and pick a cue word for “pause & return.”</li>
-          <li><strong>Next Month:</strong> One measurable goal + a consistent check-in day.</li>
-        </ul>
+        <h3 class="section-title">Your Continuing Connection Challenge</h3>
+        <div class="verse">“May the Lord make your love increase and overflow for each other and for everyone else, just as ours does for you.” — 1 Thessalonians 3:12</div>
+        <p class="intro-text">This assessment is just the beginning! Your challenge now is to consistently show up with curiosity and intentionality in your marriage. Choose one insight or practice from this assessment each week – whether it's exploring an untapped opportunity, leaning into a core strength, or applying a conflict strategy – and commit to trying it together. May your love continue to increase and overflow as you journey deeper into the amazing connection God designed for you!</p>
 
         <div class="section-divider"></div>
         <button id="downloadPdfBtn" class="btn" style="max-width:260px;">Download Couples PDF</button>
@@ -896,7 +811,87 @@
       document.getElementById('coupleFlowBtns').classList.add('hidden');
     }
 
+    /* ================== Solo page ================== */
+    function listBlocksWithIntro(title, verseKey, intro, items){
+      return `
+        <div class="subsection-divider"></div>
+        <h4 class="subsection-title">${title}</h4>
+        <div class="verse">${scripture[verseKey]}</div>
+        <p class="intro-text">${intro}</p>
+        ${items.map(([type])=>`
+          <div class="result-block" style="border-left:8px solid ${typeColors[type]}; background:${typeColorsWithOpacity[type]};">
+            <strong>${type}</strong> – ${intimacyDescriptions[type].desc}
+          </div>`).join("")}
+        <div class="discussion-prompts">
+          <strong>Discussion Prompts:</strong>
+          <ul class="results-list">
+            <li>Steward your strengths—use them intentionally twice this week.</li>
+            <li>Pick one simple practice to try in this area and schedule it.</li>
+          </ul>
+        </div>
+      `;
+    }
+
+    function buildSoloHTML(nameLabel){
+      const normalized = normalizeIntimacyScores();
+      const sorted = Object.entries(normalized).sort((a,b)=>b[1]-a[1]);
+      const priority = sorted.slice(0,4), progress = sorted.slice(4,8), presence = sorted.slice(8,12);
+      const affectionPrefs = getAffectionPreferences();
+      const social = getSocialPreferences();
+      const decision = getDecisionLeadershipStyle();
+      const bondingKey = getBondingStyle();
+      const bondingLabel = bondingKey.replace(/([a-z])([A-Z])/g,'$1 $2');
+
+      return `
+        <div class="section-divider"></div>
+        <h3 class="section-title">Section 1: Exploring the Covenant Intimacy Fulfillment Model™ (CIFM)</h3>
+        <p class="intro-text">The CIFM organizes intimacy into 12 types across four categories that balance “being together” and “doing together”.</p>
+        <ul class="results-list">
+          <li><strong>Core:</strong> Spiritual, Emotional, Commitment</li>
+          <li><strong>Relational:</strong> Intellectual, Affable, Recreational</li>
+          <li><strong>Partnership:</strong> Partnership, Stability, Creative, Conflict</li>
+          <li><strong>Physical:</strong> Physical, Sexual</li>
+        </ul>
+
+        <div class="section-divider"></div>
+        <h3 class="section-title">Section 2: ${nameLabel}'s Intimacy Type Preferences</h3>
+        ${listBlocksWithIntro("Core Connection Strengths","coreStrengths","Your top four intimacy types are your natural “on-ramps” to closeness. Nurturing these areas creates momentum for growth elsewhere.",priority)}
+        ${listBlocksWithIntro("Areas for Growth","areasForGrowth","These are familiar but less dominant. Intentional, modest effort here often unlocks steady gains in connection.",progress)}
+        ${listBlocksWithIntro("Untapped Opportunities","untappedOpps","These are rarely used pathways. Exploring one of them can add a new flavor of intimacy to your marriage.",presence)}
+
+        <div class="section-divider"></div>
+        <h3 class="section-title">Section 3: ${nameLabel}'s Relational Dynamics</h3>
+        <div class="result-block" style="border-left:8px solid ${typeColors[affectionPrefs.expressedType]}; background:${typeColorsWithOpacity[affectionPrefs.expressedType]};"><strong>How You Express Love:</strong> ${affectionPrefs.expressed}</div>
+        <div class="result-block" style="border-left:8px solid ${typeColors[affectionPrefs.desiredType]}; background:${typeColorsWithOpacity[affectionPrefs.desiredType]};"><strong>How You Feel Loved:</strong> ${affectionPrefs.desired}</div>
+        <div class="result-block" style="border-left:8px solid #FFB347; background:rgba(255,179,71,0.08);"><strong>Your Social Style:</strong> ${social}</div>
+        <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);"><strong>Your Decision Style:</strong> ${decision}</div>
+
+        <div class="section-divider"></div>
+        <h3 class="section-title">Section 4: ${nameLabel}'s Connection & Conflict Insights</h3>
+        <div class="result-block" style="border-left:8px solid ${typeColors[bondingKey]}; background:${typeColorsWithOpacity[bondingKey]};">
+          <strong>${bondingLabel}</strong>
+          <p><strong>Strengths:</strong> ${bondingInsights[bondingKey].desc}</p>
+          <p><strong>Challenges:</strong> ${bondingInsights[bondingKey].challenges}</p>
+          <p><strong>Conflict Style:</strong> ${bondingInsights[bondingKey].conflictStyle}</p>
+        </div>
+      `;
+    }
+
     /* ================== Results Flow ================== */
+    function summarizeForProfile(){
+      const normalized = normalizeIntimacyScores();
+      const sorted = Object.entries(normalized).sort((a,b)=>b[1]-a[1]);
+      const priority = sorted.slice(0,4), progress = sorted.slice(4,8), presence = sorted.slice(8,12);
+      const affectionPrefs = getAffectionPreferences();
+      const socialPreferences = getSocialPreferences();
+      const decisionLeadershipStyle = getDecisionLeadershipStyle();
+      const bondingKey = getBondingStyle();
+      const bondingLabel = bondingKey.replace(/([a-z])([A-Z])/g,'$1 $2');
+      const rrScore = respectRecognitionScore;
+      const rrLabelTxt = rrLabel(rrScore);
+      return { priority, progress, presence, affectionPrefs, socialPreferences, decisionLeadershipStyle, bondingKey, bondingLabel, respectRecognitionScore: rrScore, respectRecognitionLabel: rrLabelTxt, name: "" };
+    }
+
     function showResults(){
       document.getElementById('quizPage').classList.add('hidden');
       document.getElementById('resultPage').classList.remove('hidden');
