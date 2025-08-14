@@ -1,3 +1,4 @@
+<!-- /index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,6 +31,8 @@
 
     .result-block { margin-bottom: 16px; page-break-inside: avoid; padding: 20px; border-left: 8px solid; border-radius: 8px; background: #FFFFFF; opacity: 0; transform: translateY(10px); animation: fadeIn 0.5s ease forwards; }
     @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+    /* Disable animations when exporting/printing */
+    .no-anim .result-block { opacity: 1 !important; transform: none !important; animation: none !important; }
 
     .results-list { list-style-position: outside; margin-left: 20px; text-align: left; }
     .results-list li { margin-bottom: 8px; }
@@ -44,7 +47,7 @@
     .couple-grid::before { content: ""; position: absolute; left: 50%; top: 0; width: 2px; height: 100%; background: #4D9DE0; transform: translateX(-1px); }
     .partner-card { border: none; }
     .partner-inner { border-radius: 12px; padding: 16px; }
-    .partner-header { font-weight: 700; text-align: center; margin-bottom: 6px; }
+    .partner-header { font-weight: 700; text-align: center; margin-bottom: 6px; font-size: 1rem; }
     .pill { display:inline-block; padding:6px 10px; border-radius:999px; margin:4px 4px 0 0; font-size:0.9rem; border:1px solid #E0E0E0; }
     .overlap-box { background:#FFFFFF; border-left:8px solid #FF4D4D; border-radius:8px; padding:16px; }
 
@@ -64,10 +67,15 @@
       .btn { display:none !important; }
       .card { border: none; box-shadow: none; }
       body { background: white; }
+      .result-block { opacity: 1 !important; transform: none !important; animation: none !important; }
+      /* Keep two columns in print for clarity */
+      .couple-grid { grid-template-columns: 1fr 1fr !important; }
+      .couple-grid::before { display:none !important; }
     }
     @media (max-width: 600px) {
       .couple-grid { grid-template-columns: 1fr; }
       .couple-grid::before { display:none; }
+      .partner-header { font-size: 1.05rem; }
     }
   </style>
 </head>
@@ -525,7 +533,7 @@
       `;
     }
 
-    /* ================== Section 4: Connection Patterns (updated) ================== */
+    /* ================== Section 4: Connection Patterns ================== */
     function buildConnectionPatternsSection(A,B){
       const col = (p)=>`
         <div class="partner-card"><div class="partner-inner">
@@ -549,7 +557,7 @@
       `;
     }
 
-    /* ================== Section 3: Relational Dynamics (unchanged structure per your spec) ================== */
+    /* ================== Section 3: Relational Dynamics ================== */
     function buildSection3RelationalDynamics(A,B){
       const expressBlock = (p)=>`
         <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.expressedType]}; background:${typeColorsWithOpacity[p.affectionPrefs.expressedType]};">
@@ -643,7 +651,7 @@
       `;
     }
 
-    /* ================== Couples Rendering ================== */
+    /* ================== Couples Top Sections ================== */
     function section1CIFM(){
       return `
         <div class="section-divider"></div>
@@ -683,7 +691,6 @@
     function renderCoupleComparison(){
       const A = profiles[0], B = profiles[1];
 
-      // Top-4 overlap/unique sets (overview)
       const topA = A.priority.map(([t])=>t);
       const topB = B.priority.map(([t])=>t);
       const overlap = topA.filter(t=>topB.includes(t));
@@ -730,10 +737,8 @@
       const container = document.createElement("div");
       container.id = "couplesReport";
 
-      // Section 1 – CIFM overview
       container.innerHTML = section1CIFM();
 
-      // Overview of top strengths
       container.innerHTML += `
         <div class="section-divider"></div>
         <h3 class="section-title">Intimacy Type Strengths</h3>
@@ -754,7 +759,6 @@
         </div>
       `;
 
-      // Section 2 – requested format
       container.innerHTML += `
         <div class="section-divider"></div>
         <h3 class="section-title">Section 2: Your Intimacy Preferences</h3>
@@ -764,21 +768,16 @@
       container.innerHTML += coupleCategorySection(section2Texts.growth, A.progress, B.progress, A.name, B.name);
       container.innerHTML += coupleCategorySection(section2Texts.untapped, A.presence, B.presence, A.name, B.name);
 
-      // Section 3 – Relational Dynamics
       container.innerHTML += buildSection3RelationalDynamics(A,B);
-
-      // Section 4 – Connection Patterns (with new description), then Conflict Strategies (with new copy/table)
       container.innerHTML += buildConnectionPatternsSection(A,B);
       container.innerHTML += couplesConflictSection(A,B);
 
-      // Conclusion (replaces old Section 5)
       container.innerHTML += `
         <div class="section-divider"></div>
         <h3 class="section-title">Conclusion</h3>
         <p class="intro-text">We hope you had fun diving deep and discovering your unique connection types on multiple levels! Remember, this has been a friendly, beginner's assessment, designed not to label you, but to inspire the sparks of connection and help your marriage explore the beautiful, unique individuals within it. Use these insights as a fun tool for introspection and spouse discovery, opening up new conversations and drawing you closer. After all, to truly be known is to experience the deepest intimacy, leading you to name what's true in your relationship today and powerfully aim for what's possible tomorrow—growing in the lasting love and joy-filled fulfillment that God designed for your marriage.</p>
       `;
 
-      // Your Continuing Connection Challenge (replaces old Section 6)
       container.innerHTML += `
         <div class="section-divider"></div>
         <h3 class="section-title">Your Continuing Connection Challenge</h3>
@@ -789,21 +788,30 @@
         <button id="downloadPdfBtn" class="btn" style="max-width:260px;">Download Couples PDF</button>
       `;
 
-      // Render & PDF hook
       document.getElementById('resultsHeader').textContent = "Couples Comparison Profiles";
       const resultsEl = document.getElementById('results');
       resultsEl.innerHTML = ""; resultsEl.appendChild(container);
 
+      // Ensure all content is fully visible before capture; disable animations for export
       document.getElementById("downloadPdfBtn").onclick = () => {
+        document.body.classList.add('no-anim');
+        const target = document.getElementById('couplesReport');
         const filename = `${A.name}-${B.name}-Marriage-Connection-Report.pdf`.replace(/\s+/g,'_');
-        html2pdf().set({
-          margin:[0.5,0.5,0.5,0.5],
-          filename,
-          image:{ type:'jpeg', quality:0.98 },
-          html2canvas:{ scale:2, useCORS:true },
-          jsPDF:{ unit:'in', format:'letter', orientation:'portrait' },
-          pagebreak:{ mode:['css','legacy'] }
-        }).from(document.getElementById('couplesReport')).save();
+        // Wait one frame to let styles apply
+        requestAnimationFrame(() => {
+          html2pdf().set({
+            margin:[0.5,0.5,0.5,0.5],
+            filename,
+            image:{ type:'jpeg', quality:0.98 },
+            html2canvas:{ scale:2, useCORS:true, logging:false, windowWidth: document.documentElement.scrollWidth, windowHeight: document.documentElement.scrollHeight },
+            jsPDF:{ unit:'in', format:'letter', orientation:'portrait' },
+            pagebreak:{ mode:['css','legacy'] }
+          }).from(target).save().then(()=> {
+            document.body.classList.remove('no-anim');
+          }).catch(()=> {
+            document.body.classList.remove('no-anim');
+          });
+        });
       };
 
       document.getElementById('quizPage').classList.add('hidden');
@@ -811,7 +819,7 @@
       document.getElementById('coupleFlowBtns').classList.add('hidden');
     }
 
-    /* ================== Solo page ================== */
+    /* ================== Solo page (kept) ================== */
     function listBlocksWithIntro(title, verseKey, intro, items){
       return `
         <div class="subsection-divider"></div>
@@ -889,7 +897,8 @@
       const bondingLabel = bondingKey.replace(/([a-z])([A-Z])/g,'$1 $2');
       const rrScore = respectRecognitionScore;
       const rrLabelTxt = rrLabel(rrScore);
-      return { priority, progress, presence, affectionPrefs, socialPreferences, decisionLeadershipStyle, bondingKey, bondingLabel, respectRecognitionScore: rrScore, respectRecognitionLabel: rrLabelTxt, name: "" };
+      // IMPORTANT: no 'name' here to avoid overwriting actual names
+      return { priority, progress, presence, affectionPrefs, socialPreferences, decisionLeadershipStyle, bondingKey, bondingLabel, respectRecognitionScore: rrScore, respectRecognitionLabel: rrLabelTxt };
     }
 
     function showResults(){
@@ -907,7 +916,7 @@
       const name = partnerIndex===0 ? (partnerAName||"Partner A") : (partnerBName||"Partner B");
       const built = summarizeForProfile();
       if (partnerIndex===0) {
-        profiles[0] = { name, ...built };
+        profiles[0] = { ...built, name }; /* ensure name persists */
         document.getElementById('resultsHeader').textContent = "Partner Handoff";
         document.getElementById('results').innerHTML = `
           <div class="handoff">
@@ -926,7 +935,7 @@
           showQuestion();
         };
       } else {
-        profiles[1] = { name, ...built };
+        profiles[1] = { ...built, name }; /* ensure name persists */
         renderCoupleComparison();
       }
     }
