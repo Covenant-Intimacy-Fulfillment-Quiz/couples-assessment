@@ -83,11 +83,13 @@
     <h1>Discover Your Marriage Connection Profile</h1>
 
     <!-- Reinstated 3-paragraph intro -->
-    <div class="intro-text">
-      <p>Welcome to the <strong>Marriage Connection Assessment</strong>, a guided experience designed to help you and your spouse uncover your unique strengths and opportunities for growth. Rooted in the <strong>Covenant Intimacy Fulfillment Model™ (CIFM)</strong>, this assessment explores how you connect, communicate, and collaborate—so you can build a lasting, joy-filled marriage.</p>
-      <p>As you move through the questions, you’ll identify your natural preferences, the ways you express and receive love, and how you show up in social, decision-making, and conflict moments. The results translate those patterns into clear insights and next steps you can practice together.</p>
-      <p>Take it alone or as a couple. If you both take it, you’ll see side-by-side comparisons with personalized, practical strategies to help you steward your strengths and support each other well.</p>
-    </div>
+<div class="intro-text">
+  <h3 style="text-align:center;margin-top:0;">Unlock Your Marriage Connection: A Guide to Deeper Intimacy</h3>
+  <p>Welcome to the Marriage Connection Assessment, a guided experience designed to help you and your spouse build a happy, covenant, and joy-filled marriage as God designed.</p>
+  <p>Rooted in the groundbreaking research of Dr. Scott Inman, PhD, our Covenant Intimacy Fulfillment Model™ (CIFM) provides a proven framework for understanding how you connect, communicate, and collaborate.</p>
+  <p>As you move through these questions, you’ll discover your natural preferences, how you express and receive love, and your unique patterns in moments of communication, decision-making, and conflict. The results will give you and your spouse clear insights and personalized next steps you can practice together.</p>
+  <p>Whether you take it alone or as a couple, you'll gain a deeper understanding of your connection. If you both complete the assessment, you’ll receive a side-by-side comparison with personalized strategies to steward your strengths and support each other well.</p>
+</div>
 
     <div class="row">
       <label><input type="checkbox" id="coupleModeToggle"/> Take as a couple</label>
@@ -120,17 +122,30 @@
     <h2 id="resultsHeader">Your Personalized Connection Profile</h2>
 
     <!-- Reinstated results page 3-paragraph intro -->
-    <div class="intro-text" id="resultsIntro">
-      <p>This <strong>Marriage Connection Profile</strong>, built on the <strong>CIFM</strong>, highlights how you naturally connect and where you can intentionally grow. Treat it as a living guide, not a label—it helps you name what’s true today and aim for what’s possible tomorrow.</p>
-      <p>Your results are organized into six sections: the CIFM overview, your intimacy preferences, relational dynamics, connection & conflict insights, a shared action plan, and a partner alignment worksheet. Each section begins with a brief explanation so you can understand what you’re seeing and how to use it.</p>
-      <p>Use the <strong>Discussion Prompts</strong> at the end of sections to move the insights into action. Steward your strengths—use them intentionally twice this week—and explore one new practice together.</p>
-    </div>
+ <div class="intro-text" id="resultsIntro">
+  <h3 style="text-align:center;margin-top:0;">Your Marriage Connection Profile: The Journey Begins</h3>
+  <p>Welcome to your personalized guide to understanding each other in a new way. This profile is built on the groundbreaking research of Dr. Scott Inman, PhD, and his Covenant Intimacy Fulfillment Model™ (CIFM). It's designed to be a living map to the unique landscape of your relationship, not a set of labels. It will help you name what's true today and aim for what's possible tomorrow.</p>
 
-    <div id="results"></div>
+  <p><strong>Your results are organized into six sections:</strong></p>
+  <ul class="results-list">
+    <li>The CIFM Overview (the big picture)</li>
+    <li>Your Intimacy Preferences (how you connect)</li>
+    <li>Relational Dynamics (how you interact)</li>
+    <li>Connection &amp; Conflict Insights (how you navigate challenges)</li>
+    <li>A Shared Action Plan (what to do next)</li>
+    <li>A Partner Alignment Worksheet (for side-by-side comparison)</li>
+  </ul>
+  <p>Each section begins with a brief explanation to help you understand what you're seeing and how to use it. At the end of each section, you will find Discussion Prompts to help you turn these insights into action. We encourage you to use your strengths intentionally and explore one new practice together this week.</p>
 
-    <div id="coupleFlowBtns" class="hidden" style="margin-top:20px;">
-      <button id="startPartnerBBtn" class="btn">Start Partner B</button>
-    </div>
+  <h4 class="subsection-title" style="margin-top:18px;">The Covenant Intimacy Fulfillment Model™ (CIFM) Map</h4>
+  <p class="intro-text">The CIFM is a powerful map that gives you a shared language to navigate your relationship. It organizes intimacy into 12 types across four key categories—balancing the essential aspects of “being together” and “doing together”. As you explore your profile, you'll see how these types create a unique picture of your connection.</p>
+  <ul class="results-list">
+    <li><strong>Core:</strong> Spiritual, Emotional, Commitment</li>
+    <li><strong>Relational:</strong> Intellectual, Affable, Recreational</li>
+    <li><strong>Partnership:</strong> <u>Practical</u>, Stability, Creative, Conflict</li>
+    <li><strong>Physical:</strong> Physical, Sexual</li>
+  </ul>
+</div>
 
     <p class="muted">HappyMarriageHappyLife.com</p>
   </div>
@@ -589,19 +604,20 @@
     }
 
     /* ================== Couples Rendering ================== */
-    function section1CIFM(){
-      return `
-        <div class="section-divider"></div>
-        <h3 class="section-title">Section 1: Exploring the Covenant Intimacy Fulfillment Model™ (CIFM)</h3>
-        <p class="intro-text">The CIFM organizes intimacy into 12 types across four categories balancing “being together” and “doing together.” It gives you a shared language for how connection grows over time.</p>
-        <ul class="results-list">
-          <li><strong>Core:</strong> Spiritual, Emotional, Commitment</li>
-          <li><strong>Relational:</strong> Intellectual, Affable, Recreational</li>
-          <li><strong>Partnership:</strong> Partnership, Stability, Creative, Conflict</li>
-          <li><strong>Physical:</strong> Physical, Sexual</li>
-        </ul>
-      `;
-    }
+  function section1CIFM(){
+  return `
+    <div class="section-divider"></div>
+    <h3 class="section-title">Section 1: Exploring the Covenant Intimacy Fulfillment Model™ (CIFM)</h3>
+    <p class="intro-text">The CIFM organizes intimacy into 12 types across four categories balancing “being together” and “doing together.” It gives you a shared language for how connection grows over time.</p>
+    <ul class="results-list">
+      <li><strong>Core:</strong> Spiritual, Emotional, Commitment</li>
+      <li><strong>Relational:</strong> Intellectual, Affable, Recreational</li>
+      <li><strong>Partnership:</strong> <u>Practical</u>, Stability, Creative, Conflict</li>
+      <li><strong>Physical:</strong> Physical, Sexual</li>
+    </ul>
+  `;
+}
+
 
     function section2Intro(){
       return `
@@ -612,23 +628,47 @@
     }
 
     function partnerColumnHTML(p){
-      const blocks = (title, verseKey, intro, items) => `
-        <div class="subsection-divider"></div>
-        <h4 class="subsection-title">${title}</h4>
-        <div class="verse">${scripture[verseKey]}</div>
-        <p class="intro-text">${intro}</p>
-        ${items.map(([type])=>`
-          <div class="result-block" style="border-left:8px solid ${typeColors[type]}; background:${typeColorsWithOpacity[type]};">
-            <strong>${type}</strong> – ${intimacyDescriptions[type].desc}
-          </div>`).join("")}
-        <div class="discussion-prompts">
-          <strong>Discussion Prompts:</strong>
-          <ul class="results-list">
-            <li>Steward your strengths—use them intentionally twice this week.</li>
-            <li>Choose one small practice from this list to try together.</li>
-          </ul>
-        </div>
-      `;
+  const blocks = (title, items) => `
+    <div class="subsection-divider"></div>
+    <h4 class="subsection-title">${title}</h4>
+    ${items.map(([type])=>`
+      <div class="result-block" style="border-left:8px solid ${typeColors[type]}; background:${typeColorsWithOpacity[type]};">
+        <strong>${type}</strong> – ${intimacyDescriptions[type].desc}
+      </div>`).join("")}
+  `;
+  return `
+    <div class="partner-header">${p.name}</div>
+    ${blocks("Core Connection Strengths", p.priority)}
+    ${blocks("Areas for Growth", p.progress)}
+    ${blocks("Untapped Opportunities", p.presence)}
+
+    <div class="section-divider"></div>
+    <h3 class="section-title">${p.name}'s Relational Dynamics</h3>
+
+    <div class="subsection-divider"></div>
+    <h4 class="subsection-title">Compassion and Care</h4>
+    <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.expressedType]}; background:${typeColorsWithOpacity[p.affectionPrefs.expressedType]};"><strong>How You Express Love:</strong> ${p.affectionPrefs.expressed}</div>
+    <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.desiredType]}; background:${typeColorsWithOpacity[p.affectionPrefs.desiredType]};"><strong>How You Feel Loved:</strong> ${p.affectionPrefs.desired}</div>
+
+    <div class="subsection-divider"></div>
+    <h4 class="subsection-title">Social Engagement</h4>
+    <div class="result-block" style="border-left:8px solid #FFB347; background:rgba(255,179,71,0.08);"><strong>Your Social Style:</strong> ${p.socialPreferences}</div>
+
+    <div class="subsection-divider"></div>
+    <h4 class="subsection-title">Decision-Making and Leadership</h4>
+    <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);"><strong>Your Decision Style:</strong> ${p.decisionLeadershipStyle}</div>
+
+    <div class="section-divider"></div>
+    <h3 class="section-title">${p.name}'s Connection Pattern</h3>
+    <div class="result-block" style="border-left:8px solid ${typeColors[p.bondingKey]}; background:${typeColorsWithOpacity[p.bondingKey]};">
+      <strong>${p.bondingLabel}</strong>
+      <p><strong>Strengths:</strong> ${bondingInsights[p.bondingKey].desc}</p>
+      <p><strong>Challenges:</strong> ${bondingInsights[p.bondingKey].challenges}</p>
+      <p><strong>Conflict Style:</strong> ${bondingInsights[p.bondingKey].conflictStyle}</p>
+    </div>
+  `;
+}
+
 
       return `
         <div class="partner-header">${p.name}</div>
@@ -744,78 +784,150 @@
       `;
     }
 
-    function renderCoupleComparison(){
-      const A = profiles[0], B = profiles[1];
+    // Single shared statement blocks (scripture + one paragraph + optional prompts)
+function sharedSubsectionBlock(title, verse, bodyHtml, promptsHtml="") {
+  return `
+    <div class="subsection-divider"></div>
+    <h4 class="subsection-title">${title}</h4>
+    ${verse ? `<div class="verse">${verse}</div>` : ``}
+    <p class="intro-text">${bodyHtml}</p>
+    ${promptsHtml ? `<div class="discussion-prompts"><strong>Discussion Prompts:</strong>${promptsHtml}</div>` : ``}
+  `;
+}
 
-      // Top-4 overlap box
-      const topA = A.priority.map(([t])=>t);
-      const topB = B.priority.map(([t])=>t);
-      const overlap = topA.filter(t=>topB.includes(t));
-      const onlyA = topA.filter(t=>!topB.includes(t));
-      const onlyB = topB.filter(t=>!topA.includes(t));
-      const overlapBox = `
-        <div class="overlap-box">
-          <strong>Shared Strengths (Top-4 Overlap):</strong>
-          <div style="margin-top:8px;">
-            ${overlap.length ? overlap.map(t=>`<span class="pill" style="border-left:6px solid ${typeColors[t]}; background:${typeColorsWithOpacity[t]};">${t}</span>`).join(" ") : "<em>No overlapping top strengths—great chance to learn each other's favorites.</em>"}
-          </div>
-          <div style="margin-top:10px;"><strong>${A.name} only:</strong> ${onlyA.map(t=>`<span class="pill" style="border-left:6px solid ${typeColors[t]}; background:${typeColorsWithOpacity[t]};">${t}</span>`).join(" ") || "<em>—</em>"}</div>
-          <div style="margin-top:6px;"><strong>${B.name} only:</strong> ${onlyB.map(t=>`<span class="pill" style="border-left:6px solid ${typeColors[t]}; background:${typeColorsWithOpacity[t]};">${t}</span>`).join(" ") || "<em>—</em>"}</div>
-        </div>
-      `;
+// Section 2 shared intros + prompts (before the grid)
+function section2SharedGuides() {
+  const corePrompts = `
+    <ul class="results-list">
+      <li><em>Explore:</em> Sit down together and reciprocally share your Core Connection Strengths. Be a curious listener!<br/>
+      <span class="muted">Why is this type important to you? When do you feel most connected in this way?</span></li>
+      <li><em>Be Creative:</em> On a piece of paper, each of you write a few fun, new ideas to practice one of your spouse’s core strengths this week. Trade lists, then choose one idea to try together.</li>
+      <li><em>Share:</em> What was it like to hear what makes your spouse feel most connected? What did you learn?</li>
+    </ul>
+  `;
+  const growthPrompts = `
+    <ul class="results-list">
+      <li><em>My Perspective:</em> Which growth area feels most fun or interesting to explore this week?</li>
+      <li><em>Your Perspective:</em> What’s one specific, positive thing I could do this week to support you in one of your growth areas?</li>
+      <li><em>Just for Fun:</em> Let’s each design a creative “growth date” that includes a shared growth area.</li>
+    </ul>
+  `;
+  const untappedPrompts = `
+    <ul class="results-list">
+      <li><em>Be a Pioneer:</em> Which lowest-scored connection type feels most intriguing or surprising?</li>
+      <li><em>The First Step:</em> Pick one tiny, no-pressure way to try it this week—treat it as a fun experiment.</li>
+      <li><em>Share Your Heart:</em> Why might this be an “untapped opportunity” for you? What would it mean to grow here?</li>
+    </ul>
+  `;
 
-      // Build the page in required order
-      const container = document.createElement("div");
-      container.id = "couplesReport";
+  return `
+    ${sharedSubsectionBlock(
+      "Core Connection Strengths",
+      "“Above all, love each other deeply, because love covers over a multitude of sins.” — 1 Peter 4:8",
+      "Your Core Connection Strengths are where your love naturally shines! These are the easiest, most fulfilling ways for you to connect. By building on these strengths, you’ll not only gain momentum in your relationship, but you’ll also feel more fully seen and cherished by your spouse.",
+      corePrompts
+    )}
+    ${sharedSubsectionBlock(
+      "Areas for Growth",
+      "“Let us consider how we may spur one another on toward love and good deeds.” — Hebrews 10:24",
+      "Your Areas for Growth are familiar parts of your relationship that may not be your first choice for connecting. Think of them as opportunities for joyful practice. With a little intentional effort and encouragement, these areas can blossom and add wonderful new depth to your connection.",
+      growthPrompts
+    )}
+    ${sharedSubsectionBlock(
+      "Untapped Opportunities",
+      "“See, I am doing a new thing! … Do you not perceive it?” — Isaiah 43:19",
+      "Your Untapped Opportunities are the hidden treasures of your relationship. These aren’t weaknesses—they’re invitations to discover new ways of connecting that add depth and excitement to your marriage.",
+      untappedPrompts
+    )}
+  `;
+}
 
-      // Section 1 (CIFM)
-      container.innerHTML = section1CIFM();
+ function renderCoupleComparison(){
+  const A = profiles[0], B = profiles[1];
 
-      // Couples View + Section 2 intro + partner columns
-      container.innerHTML += `
-        <div class="section-divider"></div>
-        <h3 class="section-title">Couples View: Side-by-Side Results</h3>
-        ${overlapBox}
-        ${section2Intro()}
-        <div class="couple-grid">
-          <div class="partner-card"><div class="partner-inner">${partnerColumnHTML(A)}</div></div>
-          <div class="partner-card"><div class="partner-inner">${partnerColumnHTML(B)}</div></div>
-        </div>
-      `;
+  // Top-4 overlap/unique sets
+  const topA = A.priority.map(([t])=>t);
+  const topB = B.priority.map(([t])=>t);
+  const overlap = topA.filter(t=>topB.includes(t));
+  const onlyA = topA.filter(t=>!topB.includes(t));
+  const onlyB = topB.filter(t=>!topA.includes(t));
 
-      // Personalized Conflict section AFTER the grid (with scripture + prompts)
-      container.innerHTML += couplesConflictSection(A,B);
+  // Bubble helper
+  const bubble = t => `<span class="pill" style="border-left:6px solid ${typeColors[t]}; background:${typeColorsWithOpacity[t]};">${t}</span>`;
 
-      // Shared Sections 5 & 6
-      container.innerHTML += sections5and6Shared();
+  // Build the page in required order
+  const container = document.createElement("div");
+  container.id = "couplesReport";
 
-      // Download button
-      container.innerHTML += `
-        <div class="section-divider"></div>
-        <button id="downloadPdfBtn" class="btn" style="max-width:260px;">Download Couples PDF</button>
-      `;
+  // Section 1 (CIFM)
+  container.innerHTML = section1CIFM();
 
-      // Render and wire PDF
-      document.getElementById('resultsHeader').textContent = "Couples Comparison Profiles";
-      const resultsEl = document.getElementById('results');
-      resultsEl.innerHTML = ""; resultsEl.appendChild(container);
+  // Intimacy Type Strengths (replaces Couples View title)
+  container.innerHTML += `
+    <div class="section-divider"></div>
+    <h3 class="section-title">Intimacy Type Strengths</h3>
 
-      document.getElementById("downloadPdfBtn").onclick = () => {
-        const filename = `${A.name}-${B.name}-Marriage-Connection-Report.pdf`.replace(/\s+/g,'_');
-        html2pdf().set({
-          margin:[0.5,0.5,0.5,0.5],
-          filename,
-          image:{ type:'jpeg', quality:0.98 },
-          html2canvas:{ scale:2, useCORS:true },
-          jsPDF:{ unit:'in', format:'letter', orientation:'portrait' },
-          pagebreak:{ mode:['css','legacy'] }
-        }).from(document.getElementById('couplesReport')).save();
-      };
+    <div class="subsection-divider"></div>
+    <h4 class="subsection-title">Shared Strengths</h4>
+    <p class="intro-text">Your shared top strengths are a beautiful foundation for your relationship! These are areas where you both naturally connect and find fulfillment. Make it a point to intentionally lean into these strengths this week and celebrate them together.</p>
+    <div class="overlap-box" style="margin-top:10px;">
+      ${overlap.length ? overlap.map(bubble).join(" ") : "<em>No overlapping top strengths—great chance to learn each other's favorites.</em>"}
+    </div>
 
-      document.getElementById('quizPage').classList.add('hidden');
-      document.getElementById('resultPage').classList.remove('hidden');
-      document.getElementById('coupleFlowBtns').classList.add('hidden');
-    }
+    <div class="subsection-divider"></div>
+    <h4 class="subsection-title">Individual Strengths</h4>
+    <p class="intro-text">There are no overlapping top strengths—that's an exciting opportunity! It means you each bring unique gifts to the relationship. You have a chance to learn each other's “favorites” and introduce one another to new ways of connecting. What a great way to grow together!</p>
+    <div class="overlap-box" style="margin-top:10px;">
+      <div style="margin-top:6px;"><strong>${A.name}:</strong> ${onlyA.length ? onlyA.map(bubble).join(" ") : "<em>—</em>"}</div>
+      <div style="margin-top:6px;"><strong>${B.name}:</strong> ${onlyB.length ? onlyB.map(bubble).join(" ") : "<em>—</em>"}</div>
+    </div>
+
+    ${section2Intro()}
+    ${section2SharedGuides()}
+  `;
+
+  // Side-by-side columns (now only the lists + dynamics/decision/etc.)
+  container.innerHTML += `
+    <div class="couple-grid">
+      <div class="partner-card"><div class="partner-inner">${partnerColumnHTML(A)}</div></div>
+      <div class="partner-card"><div class="partner-inner">${partnerColumnHTML(B)}</div></div>
+    </div>
+  `;
+
+  // Personalized Conflict section (unchanged content, still includes scripture/prompt as a shared block)
+  container.innerHTML += couplesConflictSection(A,B);
+
+  // Shared Sections 5 & 6
+  container.innerHTML += sections5and6Shared();
+
+  // Download button
+  container.innerHTML += `
+    <div class="section-divider"></div>
+    <button id="downloadPdfBtn" class="btn" style="max-width:260px;">Download Couples PDF</button>
+  `;
+
+  // Render and wire PDF
+  document.getElementById('resultsHeader').textContent = "Couples Comparison Profiles";
+  const resultsEl = document.getElementById('results');
+  resultsEl.innerHTML = ""; resultsEl.appendChild(container);
+
+  document.getElementById("downloadPdfBtn").onclick = () => {
+    const filename = `${A.name}-${B.name}-Marriage-Connection-Report.pdf`.replace(/\s+/g,'_');
+    html2pdf().set({
+      margin:[0.5,0.5,0.5,0.5],
+      filename,
+      image:{ type:'jpeg', quality:0.98 },
+      html2canvas:{ scale:2, useCORS:true },
+      jsPDF:{ unit:'in', format:'letter', orientation:'portrait' },
+      pagebreak:{ mode:['css','legacy'] }
+    }).from(document.getElementById('couplesReport')).save();
+  };
+
+  document.getElementById('quizPage').classList.add('hidden');
+  document.getElementById('resultPage').classList.remove('hidden');
+  document.getElementById('coupleFlowBtns').classList.add('hidden');
+}
+
 
     /* ================== Results Flow ================== */
     function showResults(){
