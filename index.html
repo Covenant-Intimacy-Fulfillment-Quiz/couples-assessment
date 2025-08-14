@@ -147,6 +147,14 @@
   </ul>
 </div>
 
+<!-- where the script will render results -->
+<div id="results"></div>
+
+<!-- handoff button for couples flow -->
+<div id="coupleFlowBtns" class="hidden" style="margin-top:20px;">
+  <button id="startPartnerBBtn" class="btn">Start Partner B</button>
+</div>
+    
     <p class="muted">HappyMarriageHappyLife.com</p>
   </div>
 
@@ -628,7 +636,7 @@
 }
 
 
-    function partnerColumnHTML(p){
+   function partnerColumnHTML(p){
   const blocks = (title, items) => `
     <div class="subsection-divider"></div>
     <h4 class="subsection-title">${title}</h4>
@@ -637,8 +645,10 @@
         <strong>${type}</strong> – ${intimacyDescriptions[type].desc}
       </div>`).join("")}
   `;
+
   return `
     <div class="partner-header">${p.name}</div>
+
     ${blocks("Core Connection Strengths", p.priority)}
     ${blocks("Areas for Growth", p.progress)}
     ${blocks("Untapped Opportunities", p.presence)}
@@ -646,18 +656,20 @@
     <div class="section-divider"></div>
     <h3 class="section-title">${p.name}'s Relational Dynamics</h3>
 
-    <div class="subsection-divider"></div>
-    <h4 class="subsection-title">Compassion and Care</h4>
-    <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.expressedType]}; background:${typeColorsWithOpacity[p.affectionPrefs.expressedType]};"><strong>How You Express Love:</strong> ${p.affectionPrefs.expressed}</div>
-    <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.desiredType]}; background:${typeColorsWithOpacity[p.affectionPrefs.desiredType]};"><strong>How You Feel Loved:</strong> ${p.affectionPrefs.desired}</div>
+    <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.expressedType]}; background:${typeColorsWithOpacity[p.affectionPrefs.expressedType]};">
+      <strong>How You Express Love:</strong> ${p.affectionPrefs.expressed}
+    </div>
+    <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.desiredType]}; background:${typeColorsWithOpacity[p.affectionPrefs.desiredType]};">
+      <strong>How You Feel Loved:</strong> ${p.affectionPrefs.desired}
+    </div>
 
-    <div class="subsection-divider"></div>
-    <h4 class="subsection-title">Social Engagement</h4>
-    <div class="result-block" style="border-left:8px solid #FFB347; background:rgba(255,179,71,0.08);"><strong>Your Social Style:</strong> ${p.socialPreferences}</div>
+    <div class="result-block" style="border-left:8px solid #FFB347; background:rgba(255,179,71,0.08);">
+      <strong>Your Social Style:</strong> ${p.socialPreferences}
+    </div>
 
-    <div class="subsection-divider"></div>
-    <h4 class="subsection-title">Decision-Making and Leadership</h4>
-    <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);"><strong>Your Decision Style:</strong> ${p.decisionLeadershipStyle}</div>
+    <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);">
+      <strong>Your Decision Style:</strong> ${p.decisionLeadershipStyle}
+    </div>
 
     <div class="section-divider"></div>
     <h3 class="section-title">${p.name}'s Connection Pattern</h3>
@@ -669,7 +681,6 @@
     </div>
   `;
 }
-
 
       return `
         <div class="partner-header">${p.name}</div>
