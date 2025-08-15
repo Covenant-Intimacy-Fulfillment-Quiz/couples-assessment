@@ -55,7 +55,9 @@
     .input { border:1px solid #4D9DE0; border-radius:8px; padding:10px 12px; min-width:220px; }
     .muted { color:#A3A3A3; font-size:0.9rem; margin-top:10px; }
 
-    .handoff { border: 2px dashed #4D9DE0; border-radius: 12px; padding: 20px; background: #FFFFFF; }
+    .handoff { border: 2px dashed #4D9DE0; border-radius: 12px; padding: 20px; background: #FFFFFF; text-align: center; }
+    /* Center handoff paragraphs despite global .intro-text left align */
+    .handoff .intro-text { text-align: center; } /* why: overrides global to center the handoff copy */
 
     .discussion-prompts { margin-top: 12pt; margin-bottom: 12pt; }
 
@@ -133,7 +135,7 @@
         <li>Your Intimacy Preferences (how you connect)</li>
         <li>Relational Dynamics (how you interact)</li>
         <li>Connection &amp; Conflict Insights (how you navigate challenges)</li>
-        <li>Conclusion</li>
+        <li>thank you</li> <!-- changed from 'Conclusion' -->
         <li>Your Continuing Connection Challenge</li>
       </ul>
       <p>Each section begins with a brief explanation to help you understand what you're seeing and how to use it. At the end of each section, you will find Discussion Prompts to help you turn these insights into action. We encourage you to use your strengths intentionally and explore one new practice together this week.</p>
@@ -691,6 +693,9 @@
     function renderCoupleComparison(){
       const A = profiles[0], B = profiles[1];
 
+      // Ensure intro is visible again on the actual results page (hidden for handoff).
+      document.getElementById('resultsIntro').classList.remove('hidden'); /* why: only hide during handoff */
+
       const topA = A.priority.map(([t])=>t);
       const topB = B.priority.map(([t])=>t);
       const overlap = topA.filter(t=>topB.includes(t));
@@ -774,7 +779,7 @@
 
       container.innerHTML += `
         <div class="section-divider"></div>
-        <h3 class="section-title">Conclusion</h3>
+        <h3 class="section-title">thank you</h3> <!-- changed from 'Conclusion' -->
         <p class="intro-text">We hope you had fun diving deep and discovering your unique connection types on multiple levels! Remember, this has been a friendly, beginner's assessment, designed not to label you, but to inspire the sparks of connection and help your marriage explore the beautiful, unique individuals within it. Use these insights as a fun tool for introspection and spouse discovery, opening up new conversations and drawing you closer. After all, to truly be known is to experience the deepest intimacy, leading you to name what's true in your relationship today and powerfully aim for what's possible tomorrow—growing in the lasting love and joy-filled fulfillment that God designed for your marriage.</p>
       `;
 
@@ -908,6 +913,8 @@
       if (mode === "solo") {
         const name = document.getElementById("partnerAName").value.trim() || "You";
         document.getElementById('resultsHeader').textContent = "Your Personalized Connection Profile";
+        // Ensure intro visible in solo results
+        document.getElementById('resultsIntro').classList.remove('hidden'); /* why: user wants it only removed from handoff */
         document.getElementById('results').innerHTML = buildSoloHTML(name);
         document.getElementById('coupleFlowBtns').classList.add('hidden');
         return;
@@ -918,6 +925,8 @@
       if (partnerIndex===0) {
         profiles[0] = { ...built, name }; /* ensure name persists */
         document.getElementById('resultsHeader').textContent = "Partner Handoff";
+        // Hide the intro section during handoff to remove the long text
+        document.getElementById('resultsIntro').classList.add('hidden'); /* why: user asked to remove this on handoff */
         document.getElementById('results').innerHTML = `
           <div class="handoff">
             <h3 class="section-title" style="margin-top:0;">Thank you, ${name}!</h3>
