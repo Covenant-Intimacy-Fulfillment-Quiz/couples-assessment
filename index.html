@@ -59,6 +59,9 @@
 
     .discussion-prompts { margin-top: 12pt; margin-bottom: 12pt; }
 
+    /* New bordered container for final sections */
+    .framed { border: 2px solid #4D9DE0; border-radius: 12px; padding: 16px; background: #FFFFFF; }
+
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
     th, td { border: 1px solid #E0E0E0; padding: 10px; text-align: left; vertical-align: top; }
     th { background: #4D9DE0; color: white; }
@@ -121,26 +124,7 @@
     <div class="intro-text" id="resultsIntro">
       <h3 style="text-align:center;margin-top:0;">Your Marriage Connection Profile: The Journey Begins</h3>
       <p>Welcome to your personalized guide to understanding each other in a new way. This profile is built on the groundbreaking research of Dr. Scott Inman, PhD, and his Covenant Intimacy Fulfillment Model™ (CIFM). It's designed to be a living map to the unique landscape of your relationship, not a set of labels. It will help you name what's true today and aim for what's possible tomorrow.</p>
-
-      <p><strong>Your results are organized into six sections:</strong></p>
-      <ul class="results-list">
-        <li>The CIFM Overview (the big picture)</li>
-        <li>Your Intimacy Preferences (how you connect)</li>
-        <li>Relational Dynamics (how you interact)</li>
-        <li>Connection &amp; Conflict Insights (how you navigate challenges)</li>
-        <li>thank you</li>
-        <li>Your Continuing Connection Challenge</li>
-      </ul>
-      <p>Each section begins with a brief explanation to help you understand what you're seeing and how to use it. At the end of each section, you will find Discussion Prompts to help you turn these insights into action. We encourage you to use your strengths intentionally and explore one new practice together this week.</p>
-
-      <h4 class="subsection-title" style="margin-top:18px;">The Covenant Intimacy Fulfillment Model™ (CIFM) Map</h4>
-      <p class="intro-text">The CIFM is a powerful map that gives you a shared language to navigate your relationship. It organizes intimacy into 12 types across four key categories—balancing the essential aspects of “being together” and “doing together”. As you explore your profile, you'll see how these types create a unique picture of your connection.</p>
-      <ul class="results-list">
-        <li><strong>Core:</strong> Spiritual, Emotional, Commitment</li>
-        <li><strong>Relational:</strong> Intellectual, Affable, Recreational</li>
-        <li><strong>Partnership:</strong> Partnership, Stability, Creative, Conflict</li>
-        <li><strong>Physical:</strong> Physical, Sexual</li>
-      </ul>
+      <!-- Removed: sections list + CIFM Map block per user request -->
     </div>
 
     <div id="results"></div>
@@ -639,17 +623,8 @@
 
     /* ================== Couples Top Sections ================== */
     function section1CIFM(){
-      return `
-        <div class="section-divider"></div>
-        <h3 class="section-title">Section 1: Exploring the Covenant Intimacy Fulfillment Model™ (CIFM)</h3>
-        <p class="intro-text">The CIFM organizes intimacy into 12 types across four categories balancing “being together” and “doing together.” It gives you a shared language for how connection grows over time.</p>
-        <ul class="results-list">
-          <li><strong>Core:</strong> Spiritual, Emotional, Commitment</li>
-          <li><strong>Relational:</strong> Intellectual, Affable, Recreational</li>
-          <li><strong>Partnership:</strong> Partnership, Stability, Creative, Conflict</li>
-          <li><strong>Physical:</strong> Physical, Sexual</li>
-        </ul>
-      `;
+      /* NOTE: kept for reference but intentionally not used per user request to remove CIFM Map block */
+      return "";
     }
 
     function couplesConflictSection(A,B){
@@ -679,12 +654,7 @@
 
       document.getElementById('resultsIntro').classList.remove('hidden');
 
-      const topA = A.priority.map(([t])=>t);
-      const topB = B.priority.map(([t])=>t);
-      const overlap = topA.filter(t=>topB.includes(t));
-      const onlyA = topA.filter(t=>!topB.includes(t));
-      const onlyB = topB.filter(t=>!topA.includes(t));
-      const bubble = t => `<span class="pill" style="border-left:6px solid ${typeColors[t]}; background:${typeColorsWithOpacity[t]};">${t}</span>`;
+      // Removed: CIFM Map + Intimacy Type Strengths + Shared/Individual Strengths blocks per user request.
 
       const section2Texts = {
         core: {
@@ -725,27 +695,7 @@
       const container = document.createElement("div");
       container.id = "couplesReport";
 
-      container.innerHTML = section1CIFM();
-
-      container.innerHTML += `
-        <div class="section-divider"></div>
-        <h3 class="section-title">Intimacy Type Strengths</h3>
-
-        <div class="subsection-divider"></div>
-        <h4 class="subsection-title">Shared Strengths</h4>
-        <p class="intro-text">Your shared top strengths are a beautiful foundation. Lean into them intentionally this week and celebrate together.</p>
-        <div class="overlap-box" style="margin-top:10px;">
-          ${overlap.length ? overlap.map(bubble).join(" ") : "<em>No overlapping top strengths—great chance to learn each other's favorites.</em>"}
-        </div>
-
-        <div class="subsection-divider"></div>
-        <h4 class="subsection-title">Individual Strengths</h4>
-        <p class="intro-text">When your top strengths differ, you each bring unique gifts—learn and enjoy each other's favorites.</p>
-        <div class="overlap-box" style="margin-top:10px;">
-          <div style="margin-top:6px;"><strong>${A.name}:</strong> ${onlyA.length ? onlyA.map(bubble).join(" ") : "<em>—</em>"}</div>
-          <div style="margin-top:6px;"><strong>${B.name}:</strong> ${onlyB.length ? onlyB.map(bubble).join(" ") : "<em>—</em>"}</div>
-        </div>
-      `;
+      // (No CIFM section here)
 
       container.innerHTML += `
         <div class="section-divider"></div>
@@ -760,17 +710,23 @@
       container.innerHTML += buildConnectionPatternsSection(A,B);
       container.innerHTML += couplesConflictSection(A,B);
 
+      /* Thank You (capitalized) in bordered box */
       container.innerHTML += `
         <div class="section-divider"></div>
-        <h3 class="section-title">thank you</h3>
-        <p class="intro-text">We hope you had fun diving deep and discovering your unique connection types on multiple levels! Remember, this has been a friendly, beginner's assessment, designed not to label you, but to inspire the sparks of connection and help your marriage explore the beautiful, unique individuals within it. Use these insights as a fun tool for introspection and spouse discovery, opening up new conversations and drawing you closer. After all, to truly be known is to experience the deepest intimacy, leading you to name what's true in your relationship today and powerfully aim for what's possible tomorrow—growing in the lasting love and joy-filled fulfillment that God designed for your marriage.</p>
+        <div class="framed">
+          <h3 class="section-title" style="margin-top:0;">Thank You</h3>
+          <p class="intro-text">We hope you had fun diving deep and discovering your unique connection types on multiple levels! Remember, this has been a friendly, beginner's assessment, designed not to label you, but to inspire the sparks of connection and help your marriage explore the beautiful, unique individuals within it. Use these insights as a fun tool for introspection and spouse discovery, opening up new conversations and drawing you closer. After all, to truly be known is to experience the deepest intimacy, leading you to name what's true in your relationship today and powerfully aim for what's possible tomorrow—growing in the lasting love and joy-filled fulfillment that God designed for your marriage.</p>
+        </div>
       `;
 
+      /* Continuing Connection Challenge in bordered box */
       container.innerHTML += `
         <div class="section-divider"></div>
-        <h3 class="section-title">Your Continuing Connection Challenge</h3>
-        <div class="verse">“May the Lord make your love increase and overflow for each other and for everyone else, just as ours does for you.” — 1 Thessalonians 3:12</div>
-        <p class="intro-text">This assessment is just the beginning! Your challenge now is to consistently show up with curiosity and intentionality in your marriage. Choose one insight or practice from this assessment each week – whether it's exploring an untapped opportunity, leaning into a core strength, or applying a conflict strategy – and commit to trying it together. May your love continue to increase and overflow as you journey deeper into the amazing connection God designed for you!</p>
+        <div class="framed">
+          <h3 class="section-title" style="margin-top:0;">Your Continuing Connection Challenge</h3>
+          <div class="verse">“May the Lord make your love increase and overflow for each other and for everyone else, just as ours does for you.” — 1 Thessalonians 3:12</div>
+          <p class="intro-text">This assessment is just the beginning! Your challenge now is to consistently show up with curiosity and intentionality in your marriage. Choose one insight or practice from this assessment each week – whether it's exploring an untapped opportunity, leaning into a core strength, or applying a conflict strategy – and commit to trying it together. May your love continue to increase and overflow as you journey deeper into the amazing connection God designed for you!</p>
+        </div>
 
         <div class="section-divider"></div>
         <button id="downloadPdfBtn" class="btn" style="max-width:260px;">Download Couples PDF</button>
@@ -792,9 +748,7 @@
             html2canvas:{ scale:2, useCORS:true, logging:false, windowWidth: document.documentElement.scrollWidth, windowHeight: document.documentElement.scrollHeight },
             jsPDF:{ unit:'in', format:'letter', orientation:'portrait' },
             pagebreak:{ mode:['css','legacy'] }
-          }).from(target).save().then(()=> {
-            document.body.classList.remove('no-anim');
-          }).catch(()=> {
+          }).from(target).save().finally(()=> {
             document.body.classList.remove('no-anim');
           });
         });
