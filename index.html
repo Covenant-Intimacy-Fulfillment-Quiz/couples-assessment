@@ -73,7 +73,10 @@
       .result-block { opacity: 1 !important; transform: none !important; animation: none !important; }
       .couple-grid { grid-template-columns: 1fr 1fr !important; }
       .couple-grid::before { display:none !important; }
+      /* PDF-only page break hook */
+      .pdf-page-break { break-before: page; page-break-before: always; }
     }
+
     @media (max-width: 600px) {
       .couple-grid { grid-template-columns: 1fr; }
       .couple-grid::before { display:none; }
@@ -420,7 +423,7 @@
       partnerAName = document.getElementById("partnerAName").value.trim();
       partnerBName = document.getElementById("partnerBName").value.trim();
       if (!partnerAName || !partnerBName) {
-        alert("Please enter both Partner A and Partner B names to begin.");
+        alert("Please enter both Partner A and Partner B names to begin."); /* why: enforce couples-only */
         return;
       }
 
@@ -509,7 +512,7 @@
       `;
     }
 
-    /* ================== Section 3 (now 2): Relational Dynamics ================== */
+    /* ================== Section 2 (renumbered): Relational Dynamics ================== */
     function buildSection3RelationalDynamics(A,B){
       const expressBlock = (p)=>`
         <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.expressedType]}; background:${typeColorsWithOpacity[p.affectionPrefs.expressedType]};">
@@ -604,7 +607,7 @@
       `;
     }
 
-    /* ================== Section 4 (now 3): Connection Patterns ================== */
+    /* ================== Section 3: Connection Patterns ================== */
     function buildConnectionPatternsSection(A,B){
       const col = (p)=>`
         <div class="partner-card"><div class="partner-inner">
@@ -672,7 +675,7 @@
       const container = document.createElement("div");
       container.id = "couplesReport";
 
-      /* Section 1: Your Intimacy Preferences (with your requested description) */
+      /* Section 1: Your Intimacy Preferences (custom intro) */
       container.innerHTML += `
         <div class="section-divider"></div>
         <h3 class="section-title">Section 1: Your Intimacy Preferences</h3>
@@ -689,30 +692,27 @@
       container.innerHTML += buildSection3RelationalDynamics(A,B);
       container.innerHTML += buildConnectionPatternsSection(A,B);
 
-      /* Personalized Conflict Strategies (unchanged title) */
-      const conflictHTML = (() => {
-        const aToB = conflictStrategies[A.bondingKey][B.bondingKey];
-        const bToA = conflictStrategies[B.bondingKey][A.bondingKey];
-        const shared = `This is where the rubber meets the road! Understanding your individual patterns is powerful, but the real magic happens when you work together to create a joint plan that honors both of your needs. The goal isn't to change who you are, but to create a bridge between your natural responses, fostering safety and understanding during moments of tension.`;
-        return `
-          <div class="section-divider"></div>
-          <h3 class="section-title">Personalized Conflict Resolution Strategies</h3>
-          <div class="verse">${scripture.conflictStrategies}</div>
-          <p class="intro-text">When tension arises, our natural responses can sometimes create distance instead of resolution. This section offers personalized strategies designed to help you bring out the best in each other, even when things feel tough. These insights are tailored to your unique connection patterns and how you tend to respond under pressure – whether you lean towards needing space to process, or needing immediate reassurance and closeness.</p>
-          <table>
-            <tr><th>Partner</th><th>Style</th><th>Strategy</th></tr>
-            <tr><td>${A.name}</td><td>${A.bondingLabel}</td><td>${aToB}</td></tr>
-            <tr><td>${B.name}</td><td>${B.bondingLabel}</td><td>${bToA}</td></tr>
-          </table>
-          <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);">
-            <strong>Shared Strategy: Bridging Our Needs</strong>
-            <p>${shared}</p>
-          </div>
-        `;
-      })();
-      container.innerHTML += conflictHTML;
+      /* Personalized Conflict Strategies */
+      const aToB = conflictStrategies[A.bondingKey][B.bondingKey];
+      const bToA = conflictStrategies[B.bondingKey][A.bondingKey];
+      const shared = `This is where the rubber meets the road! Understanding your individual patterns is powerful, but the real magic happens when you work together to create a joint plan that honors both of your needs. The goal isn't to change who you are, but to create a bridge between your natural responses, fostering safety and understanding during moments of tension.`;
+      container.innerHTML += `
+        <div class="section-divider"></div>
+        <h3 class="section-title">Personalized Conflict Resolution Strategies</h3>
+        <div class="verse">${scripture.conflictStrategies}</div>
+        <p class="intro-text">When tension arises, our natural responses can sometimes create distance instead of resolution. This section offers personalized strategies designed to help you bring out the best in each other, even when things feel tough. These insights are tailored to your unique connection patterns and how you tend to respond under pressure – whether you lean towards needing space to process, or needing immediate reassurance and closeness.</p>
+        <table>
+          <tr><th>Partner</th><th>Style</th><th>Strategy</th></tr>
+          <tr><td>${A.name}</td><td>${A.bondingLabel}</td><td>${aToB}</td></tr>
+          <tr><td>${B.name}</td><td>${B.bondingLabel}</td><td>${bToA}</td></tr>
+        </table>
+        <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);">
+          <strong>Shared Strategy: Bridging Our Needs</strong>
+          <p>${shared}</p>
+        </div>
+      `;
 
-      /* Combined, highlighted final section */
+      /* Combined final highlighted section */
       container.innerHTML += `
         <div class="section-divider"></div>
         <div class="framed-highlight">
@@ -733,23 +733,55 @@
       const resultsEl = document.getElementById('results');
       resultsEl.innerHTML = ""; resultsEl.appendChild(container);
 
-      document.getElementById("downloadPdfBtn").onclick = () => {
-        document.body.classList.add('no-anim');
+      /* ---------- PDF HELPERS & HANDLER (ONLY CHANGE FOR PDF) ---------- */
+
+      // Waits for fonts/images so html2canvas gets correct layout sizes
+      async function waitForFontsAndImages(root) {
+        const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready.catch(()=>{}) : Promise.resolve();
+        const imgs = Array.from(root.querySelectorAll('img'));
+        const imagesReady = Promise.all(
+          imgs.map(img => img.complete ? Promise.resolve() : new Promise(res => { img.onload = img.onerror = res; }))
+        );
+        await Promise.all([fontsReady, imagesReady]);
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      }
+
+      // Tag all subsequent section dividers to start on new PDF pages
+      function applyPdfPageBreaks(root) {
+        const dividers = Array.from(root.querySelectorAll('.section-divider'));
+        dividers.forEach((el, idx) => { if (idx > 0) el.classList.add('pdf-page-break'); });
+      }
+
+      // Replace previous click handler: PNG + page breaks + top-capture
+      document.getElementById("downloadPdfBtn").onclick = async () => {
         const target = document.getElementById('couplesReport');
         const filename = `${A.name}-${B.name}-Marriage-Connection-Report.pdf`.replace(/\s+/g,'_');
-        requestAnimationFrame(() => {
-          html2pdf().set({
-            margin:[0.5,0.5,0.5,0.5],
+
+        document.body.classList.add('no-anim');
+        try {
+          applyPdfPageBreaks(target);
+          await waitForFontsAndImages(target);
+
+          const opt = {
+            margin: [0.5, 0.5, 0.5, 0.5],
             filename,
-            image:{ type:'jpeg', quality:0.98 },
-            html2canvas:{ scale:2, useCORS:true, logging:false, windowWidth: document.documentElement.scrollWidth, windowHeight: document.documentElement.scrollHeight },
-            jsPDF:{ unit:'in', format:'letter', orientation:'portrait' },
-            pagebreak:{ mode:['css','legacy'] }
-          }).from(target).save().finally(()=> {
-            document.body.classList.remove('no-anim');
-          });
-        });
+            image: { type: 'png', quality: 1 },
+            html2canvas: {
+              scale: 2,
+              useCORS: true,
+              logging: false,
+              scrollY: -window.scrollY
+            },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+            pagebreak: { mode: ['css','legacy'], before: '.pdf-page-break' }
+          };
+
+          await html2pdf().set(opt).from(target).save();
+        } finally {
+          document.body.classList.remove('no-anim');
+        }
       };
+      /* ---------- END PDF HANDLER ---------- */
 
       document.getElementById('quizPage').classList.add('hidden');
       document.getElementById('resultPage').classList.remove('hidden');
@@ -781,7 +813,7 @@
       if (partnerIndex===0) {
         profiles[0] = { ...built, name };
         document.getElementById('resultsHeader').textContent = "Partner Handoff";
-        document.getElementById('resultsIntro').classList.add('hidden');
+        document.getElementById('resultsIntro').classList.add('hidden'); /* why: declutter the handoff screen */
         document.getElementById('results').innerHTML = `
           <div class="handoff">
             <h3 class="section-title" style="margin-top:0;">Thank you, ${name}!</h3>
