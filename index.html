@@ -55,12 +55,12 @@
     .muted { color:#A3A3A3; font-size:0.9rem; margin-top:10px; }
 
     .handoff { border: 2px dashed #4D9DE0; border-radius: 12px; padding: 20px; background: #FFFFFF; text-align: center; }
-    .handoff .intro-text { text-align: center; } /* why: keep handoff copy centered */
+    .handoff .intro-text { text-align: center; }
 
     .discussion-prompts { margin-top: 12pt; margin-bottom: 12pt; }
 
-    /* New bordered container for final sections */
-    .framed { border: 2px solid #4D9DE0; border-radius: 12px; padding: 16px; background: #FFFFFF; }
+    /* Highlighted frame (light blue, same opacity feel as other blocks) */
+    .framed-highlight { border: 2px solid #4D9DE0; border-radius: 12px; padding: 16px; background: rgba(77,157,224,0.08); }
 
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
     th, td { border: 1px solid #E0E0E0; padding: 10px; text-align: left; vertical-align: top; }
@@ -124,7 +124,7 @@
     <div class="intro-text" id="resultsIntro">
       <h3 style="text-align:center;margin-top:0;">Your Marriage Connection Profile: The Journey Begins</h3>
       <p>Welcome to your personalized guide to understanding each other in a new way. This profile is built on the groundbreaking research of Dr. Scott Inman, PhD, and his Covenant Intimacy Fulfillment Model™ (CIFM). It's designed to be a living map to the unique landscape of your relationship, not a set of labels. It will help you name what's true today and aim for what's possible tomorrow.</p>
-      <!-- Removed: sections list + CIFM Map block per user request -->
+      <!-- (Requested removals remain removed) -->
     </div>
 
     <div id="results"></div>
@@ -405,6 +405,12 @@
       return "Needs Attention";
     }
 
+    function rrStatement(score){
+      if(score >= 5) return "You generally feel affirmed, appreciated, respected, and validated—and you likely offer the same in return.";
+      if(score >= 3) return "You often feel appreciated and respected, though there may be moments when clearer affirmation would be meaningful.";
+      return "You may not consistently feel affirmed or validated; be explicit about the kinds of appreciation that help you feel respected.";
+    }
+
     /* ================== UI Wiring ================== */
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("startQuizBtn").addEventListener("click", startQuiz);
@@ -414,7 +420,7 @@
       partnerAName = document.getElementById("partnerAName").value.trim();
       partnerBName = document.getElementById("partnerBName").value.trim();
       if (!partnerAName || !partnerBName) {
-        alert("Please enter both Partner A and Partner B names to begin."); // why: enforce couples-only
+        alert("Please enter both Partner A and Partner B names to begin.");
         return;
       }
 
@@ -503,31 +509,7 @@
       `;
     }
 
-    /* ================== Section 4: Connection Patterns ================== */
-    function buildConnectionPatternsSection(A,B){
-      const col = (p)=>`
-        <div class="partner-card"><div class="partner-inner">
-          <div class="partner-header">${p.name}</div>
-          <div class="result-block" style="border-left:8px solid ${typeColors[p.bondingKey]}; background:${typeColorsWithOpacity[p.bondingKey]};">
-            <strong>${p.bondingLabel}</strong>
-            <p><strong>Strengths:</strong> ${bondingInsights[p.bondingKey].desc}</p>
-            <p><strong>Challenges:</strong> ${bondingInsights[p.bondingKey].challenges}</p>
-            <p><strong>Conflict Style:</strong> ${bondingInsights[p.bondingKey].conflictStyle}</p>
-          </div>
-        </div></div>
-      `;
-      return `
-        <div class="section-divider"></div>
-        <h3 class="section-title">Section 4: Connection Patterns</h3>
-        <div class="verse">${scripture.connectionPattern}</div>
-        <p class="intro-text">Everyone has a unique pattern for how they approach connection and conflict. Your results here will illuminate how you tend to respond to perceived tension and how you desire to repair after it. This section is a powerful invitation to understand yourselves and each other better, turning challenging moments into opportunities for deeper connection. We hope these insights provide a helpful starting point for a deeper, more empathetic conversation with your spouse, helping you build a healthier, more resilient relationship.</p>
-        <div class="couple-grid">
-          ${col(A)}${col(B)}
-        </div>
-      `;
-    }
-
-    /* ================== Section 3: Relational Dynamics ================== */
+    /* ================== Section 3 (now 2): Relational Dynamics ================== */
     function buildSection3RelationalDynamics(A,B){
       const expressBlock = (p)=>`
         <div class="result-block" style="border-left:8px solid ${typeColors[p.affectionPrefs.expressedType]}; background:${typeColorsWithOpacity[p.affectionPrefs.expressedType]};">
@@ -550,12 +532,13 @@
       const rrBlock = (p)=>`
         <div class="result-block" style="border-left:8px solid #6A4C93; background:rgba(106,76,147,0.08);">
           <strong>Your Respect &amp; Recognition:</strong> ${p.respectRecognitionLabel} (${p.respectRecognitionScore}/6)
+          <p style="margin:8px 0 0;">${rrStatement(p.respectRecognitionScore)}</p>
         </div>
       `;
 
       return `
         <div class="section-divider"></div>
-        <h3 class="section-title">Section 3: Relational Dynamics</h3>
+        <h3 class="section-title">Section 2: Relational Dynamics</h3>
         <div class="verse">“Be completely humble and gentle; be patient, bearing with one another in love.”— Ephesians 4:2</div>
         <p class="intro-text">Your relational dynamics are the everyday rhythms of your connection—how you express love, engage socially, and make decisions together. By understanding and embracing these differences, you can protect your closeness and build a deeper connection. Understanding these dynamics can provide insight into the core drivers of your interactions and motivations. Let's explore what makes your relationship uniquely yours!</p>
 
@@ -621,40 +604,34 @@
       `;
     }
 
-    /* ================== Couples Top Sections ================== */
-    function section1CIFM(){
-      /* NOTE: kept for reference but intentionally not used per user request to remove CIFM Map block */
-      return "";
-    }
-
-    function couplesConflictSection(A,B){
-      const aToB = conflictStrategies[A.bondingKey][B.bondingKey];
-      const bToA = conflictStrategies[B.bondingKey][A.bondingKey];
-      const shared = `This is where the rubber meets the road! Understanding your individual patterns is powerful, but the real magic happens when you work together to create a joint plan that honors both of your needs. The goal isn't to change who you are, but to create a bridge between your natural responses, fostering safety and understanding during moments of tension.`;
-
+    /* ================== Section 4 (now 3): Connection Patterns ================== */
+    function buildConnectionPatternsSection(A,B){
+      const col = (p)=>`
+        <div class="partner-card"><div class="partner-inner">
+          <div class="partner-header">${p.name}</div>
+          <div class="result-block" style="border-left:8px solid ${typeColors[p.bondingKey]}; background:${typeColorsWithOpacity[p.bondingKey]};">
+            <strong>${p.bondingLabel}</strong>
+            <p><strong>Strengths:</strong> ${bondingInsights[p.bondingKey].desc}</p>
+            <p><strong>Challenges:</strong> ${bondingInsights[p.bondingKey].challenges}</p>
+            <p><strong>Conflict Style:</strong> ${bondingInsights[p.bondingKey].conflictStyle}</p>
+          </div>
+        </div></div>
+      `;
       return `
         <div class="section-divider"></div>
-        <h3 class="section-title">Personalized Conflict Resolution Strategies</h3>
-        <div class="verse">${scripture.conflictStrategies}</div>
-        <p class="intro-text">When tension arises, our natural responses can sometimes create distance instead of resolution. This section offers personalized strategies designed to help you bring out the best in each other, even when things feel tough. These insights are tailored to your unique connection patterns and how you tend to respond under pressure – whether you lean towards needing space to process, or needing immediate reassurance and closeness.</p>
-        <table>
-          <tr><th>Partner</th><th>Style</th><th>Strategy</th></tr>
-          <tr><td>${A.name}</td><td>${A.bondingLabel}</td><td>${aToB}</td></tr>
-          <tr><td>${B.name}</td><td>${B.bondingLabel}</td><td>${bToA}</td></tr>
-        </table>
-        <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);">
-          <strong>Shared Strategy: Bridging Our Needs</strong>
-          <p>${shared}</p>
+        <h3 class="section-title">Section 3: Connection Patterns</h3>
+        <div class="verse">${scripture.connectionPattern}</div>
+        <p class="intro-text">Everyone has a unique pattern for how they approach connection and conflict. Your results here will illuminate how you tend to respond to perceived tension and how you desire to repair after it. This section is a powerful invitation to understand yourselves and each other better, turning challenging moments into opportunities for deeper connection. We hope these insights provide a helpful starting point for a deeper, more empathetic conversation with your spouse, helping you build a healthier, more resilient relationship.</p>
+        <div class="couple-grid">
+          ${col(A)}${col(B)}
         </div>
       `;
     }
 
+    /* ================== Couples Top Sections ================== */
     function renderCoupleComparison(){
       const A = profiles[0], B = profiles[1];
-
       document.getElementById('resultsIntro').classList.remove('hidden');
-
-      // Removed: CIFM Map + Intimacy Type Strengths + Shared/Individual Strengths blocks per user request.
 
       const section2Texts = {
         core: {
@@ -695,12 +672,15 @@
       const container = document.createElement("div");
       container.id = "couplesReport";
 
-      // (No CIFM section here)
-
+      /* Section 1: Your Intimacy Preferences (with your requested description) */
       container.innerHTML += `
         <div class="section-divider"></div>
-        <h3 class="section-title">Section 2: Your Intimacy Preferences</h3>
-        <p class="intro-text">This section reveals how you each naturally connect. Use the side-by-side lists to compare patterns and pick one small practice to try this week.</p>
+        <h3 class="section-title">Section 1: Your Intimacy Preferences</h3>
+        <div class="intro-text">
+          This section is all about understanding intimacy—not just physical closeness, but the profound experience of being truly known, deeply connected, and fully cherished by your spouse. It reveals your unique connection profile, showing how you naturally express love and how you feel most loved in return.
+          <p>The Covenant Intimacy Fulfillment Model™ (CIFM) acts as your powerful map for this journey. It organizes intimacy into 12 distinct types, balancing the essential aspects of 'being together' (like emotional closeness and shared commitment) and 'doing together' (like collaborating on projects or enjoying recreation). As you explore your results, you'll see how these 12 types paint a unique and vibrant picture of your specific connection.</p>
+          <p>Think of your profile as a guide to your relationship's most rewarding and vibrant pathways to closeness.</p>
+        </div>
       `;
       container.innerHTML += coupleCategorySection(section2Texts.core, A.priority, B.priority, A.name, B.name);
       container.innerHTML += coupleCategorySection(section2Texts.growth, A.progress, B.progress, A.name, B.name);
@@ -708,22 +688,39 @@
 
       container.innerHTML += buildSection3RelationalDynamics(A,B);
       container.innerHTML += buildConnectionPatternsSection(A,B);
-      container.innerHTML += couplesConflictSection(A,B);
 
-      /* Thank You (capitalized) in bordered box */
+      /* Personalized Conflict Strategies (unchanged title) */
+      const conflictHTML = (() => {
+        const aToB = conflictStrategies[A.bondingKey][B.bondingKey];
+        const bToA = conflictStrategies[B.bondingKey][A.bondingKey];
+        const shared = `This is where the rubber meets the road! Understanding your individual patterns is powerful, but the real magic happens when you work together to create a joint plan that honors both of your needs. The goal isn't to change who you are, but to create a bridge between your natural responses, fostering safety and understanding during moments of tension.`;
+        return `
+          <div class="section-divider"></div>
+          <h3 class="section-title">Personalized Conflict Resolution Strategies</h3>
+          <div class="verse">${scripture.conflictStrategies}</div>
+          <p class="intro-text">When tension arises, our natural responses can sometimes create distance instead of resolution. This section offers personalized strategies designed to help you bring out the best in each other, even when things feel tough. These insights are tailored to your unique connection patterns and how you tend to respond under pressure – whether you lean towards needing space to process, or needing immediate reassurance and closeness.</p>
+          <table>
+            <tr><th>Partner</th><th>Style</th><th>Strategy</th></tr>
+            <tr><td>${A.name}</td><td>${A.bondingLabel}</td><td>${aToB}</td></tr>
+            <tr><td>${B.name}</td><td>${B.bondingLabel}</td><td>${bToA}</td></tr>
+          </table>
+          <div class="result-block" style="border-left:8px solid #4D9DE0; background:rgba(77,157,224,0.08);">
+            <strong>Shared Strategy: Bridging Our Needs</strong>
+            <p>${shared}</p>
+          </div>
+        `;
+      })();
+      container.innerHTML += conflictHTML;
+
+      /* Combined, highlighted final section */
       container.innerHTML += `
         <div class="section-divider"></div>
-        <div class="framed">
+        <div class="framed-highlight">
           <h3 class="section-title" style="margin-top:0;">Thank You</h3>
           <p class="intro-text">We hope you had fun diving deep and discovering your unique connection types on multiple levels! Remember, this has been a friendly, beginner's assessment, designed not to label you, but to inspire the sparks of connection and help your marriage explore the beautiful, unique individuals within it. Use these insights as a fun tool for introspection and spouse discovery, opening up new conversations and drawing you closer. After all, to truly be known is to experience the deepest intimacy, leading you to name what's true in your relationship today and powerfully aim for what's possible tomorrow—growing in the lasting love and joy-filled fulfillment that God designed for your marriage.</p>
-        </div>
-      `;
 
-      /* Continuing Connection Challenge in bordered box */
-      container.innerHTML += `
-        <div class="section-divider"></div>
-        <div class="framed">
-          <h3 class="section-title" style="margin-top:0;">Your Continuing Connection Challenge</h3>
+          <div class="subsection-divider"></div>
+          <h3 class="section-title">Your Continuing Connection Challenge</h3>
           <div class="verse">“May the Lord make your love increase and overflow for each other and for everyone else, just as ours does for you.” — 1 Thessalonians 3:12</div>
           <p class="intro-text">This assessment is just the beginning! Your challenge now is to consistently show up with curiosity and intentionality in your marriage. Choose one insight or practice from this assessment each week – whether it's exploring an untapped opportunity, leaning into a core strength, or applying a conflict strategy – and commit to trying it together. May your love continue to increase and overflow as you journey deeper into the amazing connection God designed for you!</p>
         </div>
@@ -784,7 +781,7 @@
       if (partnerIndex===0) {
         profiles[0] = { ...built, name };
         document.getElementById('resultsHeader').textContent = "Partner Handoff";
-        document.getElementById('resultsIntro').classList.add('hidden'); /* why: declutter the handoff screen */
+        document.getElementById('resultsIntro').classList.add('hidden');
         document.getElementById('results').innerHTML = `
           <div class="handoff">
             <h3 class="section-title" style="margin-top:0;">Thank you, ${name}!</h3>
