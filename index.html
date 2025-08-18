@@ -731,15 +731,13 @@
 
         <div class="section-divider"></div>
         <button id="downloadPdfBtn" class="btn" style="max-width:260px;">Download Couples PDF</button>
-      ";
+      `;  <!-- ✅ fixed: backtick closes the template string -->
 
       document.getElementById('resultsHeader').textContent = "Couples Comparison Profiles";
       const resultsEl = document.getElementById('results');
       resultsEl.innerHTML = ""; resultsEl.appendChild(container);
 
       /* ---------- PDF HELPERS & HANDLER (ONLY CHANGE FOR PDF) ---------- */
-
-      // why: ensures fonts/images are loaded and layout is stable for measurement
       async function waitForFontsAndImages(root) {
         const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready.catch(()=>{}) : Promise.resolve();
         const imgs = Array.from(root.querySelectorAll('img'));
@@ -750,9 +748,8 @@
         await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
       }
 
-      // why: insert explicit html2pdf page-break markers before each main section (except the first)
       function applyPdfPageBreaks(root) {
-        root.querySelectorAll('.html2pdf__page-break').forEach(n => n.remove()); // idempotent
+        root.querySelectorAll('.html2pdf__page-break').forEach(n => n.remove());
         const dividers = Array.from(root.querySelectorAll('.section-divider'));
         for (let i = 1; i < dividers.length; i++) {
           const marker = document.createElement('div');
@@ -765,11 +762,11 @@
         const target = document.getElementById('couplesReport');
         const filename = `${A.name}-${B.name}-Marriage-Connection-Report.pdf`.replace(/\s+/g,'_');
 
-        const prevX = window.scrollX, prevY = window.scrollY; // why: restore scroll after capture
+        const prevX = window.scrollX, prevY = window.scrollY;
         document.body.classList.add('no-anim');
 
         try {
-          window.scrollTo(0, 0);              // why: force capture from top-left
+          window.scrollTo(0, 0);
           applyPdfPageBreaks(target);
           await waitForFontsAndImages(target);
 
@@ -783,11 +780,11 @@
               logging: false,
               scrollX: 0,
               scrollY: 0,
-              windowWidth: target.scrollWidth,   // why: ensure full width/height measured
+              windowWidth: target.scrollWidth,
               windowHeight: target.scrollHeight
             },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-            pagebreak: { mode: ['css','legacy'] } // honors .html2pdf__page-break
+            pagebreak: { mode: ['css','legacy'] }
           };
 
           await html2pdf().set(opt).from(target).save();
