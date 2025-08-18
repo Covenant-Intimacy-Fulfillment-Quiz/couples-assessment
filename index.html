@@ -66,6 +66,9 @@
     th, td { border: 1px solid #E0E0E0; padding: 10px; text-align: left; vertical-align: top; }
     th { background: #4D9DE0; color: white; }
 
+    /* html2pdf break marker (no visual impact on screen) */
+    .html2pdf__page-break { height: 0; }
+
     @media print {
       .btn { display:none !important; }
       .card { border: none; box-shadow: none; }
@@ -73,8 +76,9 @@
       .result-block { opacity: 1 !important; transform: none !important; animation: none !important; }
       .couple-grid { grid-template-columns: 1fr 1fr !important; }
       .couple-grid::before { display:none !important; }
-      /* PDF-only page break hook */
+      /* PDF-only page break hooks */
       .pdf-page-break { break-before: page; page-break-before: always; }
+      .html2pdf__page-break { break-before: page; page-break-before: always; }
     }
 
     @media (max-width: 600px) {
@@ -675,7 +679,7 @@
       const container = document.createElement("div");
       container.id = "couplesReport";
 
-      /* Section 1: Your Intimacy Preferences (custom intro) */
+      /* Section 1: Your Intimacy Preferences */
       container.innerHTML += `
         <div class="section-divider"></div>
         <h3 class="section-title">Section 1: Your Intimacy Preferences</h3>
@@ -727,7 +731,7 @@
 
         <div class="section-divider"></div>
         <button id="downloadPdfBtn" class="btn" style="max-width:260px;">Download Couples PDF</button>
-      `;
+      ";
 
       document.getElementById('resultsHeader').textContent = "Couples Comparison Profiles";
       const resultsEl = document.getElementById('results');
@@ -735,7 +739,7 @@
 
       /* ---------- PDF HELPERS & HANDLER (ONLY CHANGE FOR PDF) ---------- */
 
-      // Waits for fonts/images so html2canvas gets correct layout sizes
+      // why: ensures fonts/images are loaded and layout is stable for measurement
       async function waitForFontsAndImages(root) {
         const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready.catch(()=>{}) : Promise.resolve();
         const imgs = Array.from(root.querySelectorAll('img'));
@@ -746,19 +750,26 @@
         await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
       }
 
-      // Tag all subsequent section dividers to start on new PDF pages
+      // why: insert explicit html2pdf page-break markers before each main section (except the first)
       function applyPdfPageBreaks(root) {
+        root.querySelectorAll('.html2pdf__page-break').forEach(n => n.remove()); // idempotent
         const dividers = Array.from(root.querySelectorAll('.section-divider'));
-        dividers.forEach((el, idx) => { if (idx > 0) el.classList.add('pdf-page-break'); });
+        for (let i = 1; i < dividers.length; i++) {
+          const marker = document.createElement('div');
+          marker.className = 'html2pdf__page-break';
+          dividers[i].parentNode.insertBefore(marker, dividers[i]);
+        }
       }
 
-      // Replace previous click handler: PNG + page breaks + top-capture
       document.getElementById("downloadPdfBtn").onclick = async () => {
         const target = document.getElementById('couplesReport');
         const filename = `${A.name}-${B.name}-Marriage-Connection-Report.pdf`.replace(/\s+/g,'_');
 
+        const prevX = window.scrollX, prevY = window.scrollY; // why: restore scroll after capture
         document.body.classList.add('no-anim');
+
         try {
+          window.scrollTo(0, 0);              // why: force capture from top-left
           applyPdfPageBreaks(target);
           await waitForFontsAndImages(target);
 
@@ -770,15 +781,19 @@
               scale: 2,
               useCORS: true,
               logging: false,
-              scrollY: -window.scrollY
+              scrollX: 0,
+              scrollY: 0,
+              windowWidth: target.scrollWidth,   // why: ensure full width/height measured
+              windowHeight: target.scrollHeight
             },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-            pagebreak: { mode: ['css','legacy'], before: '.pdf-page-break' }
+            pagebreak: { mode: ['css','legacy'] } // honors .html2pdf__page-break
           };
 
           await html2pdf().set(opt).from(target).save();
         } finally {
           document.body.classList.remove('no-anim');
+          window.scrollTo(prevX, prevY);
         }
       };
       /* ---------- END PDF HANDLER ---------- */
